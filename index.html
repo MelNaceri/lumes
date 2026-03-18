@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMÈS — Révèle ton sommeil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #0C0F14;
+    --deep: #131720;
+    --ink: #1C2130;
+    --mist: #8B96A8;
+    --moon: #C8D4E8;
+    --star: #E8EDF5;
+    --gold: #C9A96E;
+    --gold-light: #E2C98A;
+    --aurora: #5B7FA6;
+    --glow: rgba(201,169,110,0.15);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 4px;
+    --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--night);
+    color: var(--star);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ── NAVIGATION ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: linear-gradient(to bottom, rgba(12,15,20,0.95), transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,212,232,0.06);
+    transition: var(--transition);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--mist);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold) !important;
+    padding: 0.6rem 1.5rem;
+    border-radius: 2px;
+    transition: all 0.3s !important;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .nav-cta:hover { background: var(--gold) !important; color: var(--night) !important; }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .hamburger span {
+    width: 24px; height: 1px;
+    background: var(--moon);
+    transition: var(--transition);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    padding: 8rem 2rem 4rem;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(91,127,166,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,169,110,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 20% 60%, rgba(91,127,166,0.06) 0%, transparent 60%),
+      var(--night);
+  }
+
+  /* Stars */
+  .stars {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .star-dot {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--op-min, 0.1); transform: scale(1); }
+    50% { opacity: var(--op-max, 0.8); transform: scale(1.3); }
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeUp 1s ease both 0.3s;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--star);
+    margin-bottom: 1.5rem;
+    position: relative;
+    animation: fadeUp 1s ease both 0.5s;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--mist);
+    max-width: 540px;
+    margin: 0 auto 3rem;
+    line-height: 1.8;
+    animation: fadeUp 1s ease both 0.7s;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 1s ease both 0.9s;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--night);
+    border: none;
+    padding: 1rem 2.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,169,110,0.3);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--moon);
+    border: 1px solid rgba(200,212,232,0.25);
+    padding: 1rem 2.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-ghost:hover {
+    border-color: var(--moon);
+    background: rgba(200,212,232,0.05);
+  }
+
+  .hero-trust {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    animation: fadeUp 1s ease both 1.1s;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--mist);
+    letter-spacing: 0.1em;
+  }
+
+  .trust-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  /* ── SOCIAL PROOF BAR ── */
+  .proof-bar {
+    background: var(--deep);
+    border-top: 1px solid rgba(200,212,232,0.06);
+    border-bottom: 1px solid rgba(200,212,232,0.06);
+    padding: 1.5rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    overflow: hidden;
+  }
+
+  .proof-stat {
+    text-align: center;
+    flex: 1;
+  }
+
+  .proof-number {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--gold);
+    display: block;
+  }
+
+  .proof-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+
+  .proof-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(200,212,232,0.1);
+  }
+
+  /* ── SECTIONS COMMON ── */
+  section {
+    padding: 8rem 4rem;
+  }
+
+  .section-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--star);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* ── PRODUCTS ── */
+  .products-section {
+    background: var(--deep);
+    position: relative;
+  }
+
+  .products-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,169,110,0.3), transparent);
+  }
+
+  .products-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 5rem;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-card {
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    group: true;
+    transition: transform 0.4s ease;
+  }
+  .product-card:hover { transform: translateY(-4px); }
+
+  .product-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid transparent;
+    transition: border-color 0.4s;
+    pointer-events: none;
+  }
+  .product-card:hover::after { border-color: rgba(201,169,110,0.3); }
+
+  .product-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-img-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s ease;
+  }
+  .product-card:hover .product-img-bg { transform: scale(1.05); }
+
+  .product-badge {
+    position: absolute;
+    top: 1rem; left: 1rem;
+    background: var(--gold);
+    color: var(--night);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 1px;
+    font-weight: 500;
+  }
+
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .product-name {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--star);
+    margin-bottom: 0.4rem;
+  }
+
+  .product-desc {
+    font-size: 0.8rem;
+    color: var(--mist);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .product-price {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+
+  .product-price-old {
+    font-size: 0.9rem;
+    color: var(--mist);
+    text-decoration: line-through;
+    margin-left: 0.5rem;
+  }
+
+  .btn-add {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.5rem 1.2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.3s;
+    font-family: var(--font-body);
+  }
+  .btn-add:hover { background: var(--gold); color: var(--night); }
+
+  /* ── HERO PRODUCT ── */
+  .hero-product {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-visual {
+    position: relative;
+  }
+
+  .product-main-img {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, var(--ink) 0%, var(--deep) 100%);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-main-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 30%, rgba(201,169,110,0.1), transparent 60%);
+  }
+
+  .product-glow {
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,169,110,0.2), transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+  }
+
+  .product-floating {
+    position: absolute;
+    background: rgba(19,23,32,0.9);
+    border: 1px solid rgba(200,212,232,0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+  }
+
+  .floating-review {
+    bottom: -1rem;
+    right: -2rem;
+  }
+
+  .stars-row { color: var(--gold); font-size: 0.8rem; margin-bottom: 0.3rem; }
+  .floating-text { font-size: 0.75rem; color: var(--moon); }
+  .floating-author { font-size: 0.65rem; color: var(--mist); margin-top: 0.3rem; }
+
+  .product-detail {
+    padding-left: 2rem;
+  }
+
+  .product-detail-price {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .product-detail-price span {
+    font-size: 1.2rem;
+    color: var(--mist);
+    text-decoration: line-through;
+    margin-left: 1rem;
+  }
+
+  .product-savings {
+    display: inline-block;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.2);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+  }
+
+  .product-features {
+    list-style: none;
+    margin-bottom: 2.5rem;
+  }
+
+  .product-features li {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--moon);
+  }
+
+  .feature-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  .buy-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .quantity-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .qty-btn {
+    width: 36px; height: 36px;
+    background: var(--ink);
+    border: 1px solid rgba(200,212,232,0.15);
+    color: var(--star);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .qty-display {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    min-width: 2rem;
+    text-align: center;
+  }
+
+  .guarantee {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--mist);
+    padding-top: 0.5rem;
+  }
+
+  /* ── BENEFITS ── */
+  .benefits-section {
+    background: var(--night);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .benefits-section::before {
+    content: '';
+    position: absolute;
+    right: -200px; top: 50%;
+    transform: translateY(-50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(91,127,166,0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .benefit-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+  .benefit-item.visible { opacity: 1; transform: translateY(0); }
+
+  .benefit-num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 300;
+    color: rgba(201,169,110,0.2);
+    line-height: 1;
+    flex-shrink: 0;
+    transition-delay: 0.1s;
+  }
+
+  .benefit-text h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--star);
+    margin-bottom: 0.5rem;
+  }
+
+  .benefit-text p {
+    font-size: 0.88rem;
+    color: var(--mist);
+    line-height: 1.7;
+  }
+
+  .benefits-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .circle-art {
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .circle-art::before {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.08);
+  }
+
+  .circle-art::after {
+    content: '';
+    position: absolute;
+    inset: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.05);
+  }
+
+  .circle-inner {
+    font-size: 6rem;
+    position: relative;
+    z-index: 1;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-section {
+    background: var(--deep);
+    position: relative;
+  }
+
+  .testimonials-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,169,110,0.3), transparent);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .testimonial-card {
+    background: var(--ink);
+    padding: 2rem;
+    border-radius: 4px;
+    border: 1px solid rgba(200,212,232,0.06);
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .testimonial-card:hover {
+    border-color: rgba(201,169,110,0.2);
+    transform: translateY(-4px);
+  }
+
+  .testimonial-quote {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.9rem;
+    color: var(--moon);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .author-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--aurora), var(--ink));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .author-name {
+    font-size: 0.85rem;
+    color: var(--star);
+    display: block;
+    margin-bottom: 0.1rem;
+  }
+
+  .author-detail {
+    font-size: 0.7rem;
+    color: var(--mist);
+  }
+
+  .stars-gold { color: var(--gold); font-size: 0.75rem; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    background: var(--night);
+  }
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .steps-row::before {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold) 0%, rgba(201,169,110,0.2) 100%);
+    opacity: 0.3;
+  }
+
+  .step-card {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    position: relative;
+  }
+
+  .step-icon {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 1px solid rgba(201,169,110,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1.5rem;
+    position: relative;
+  }
+
+  .step-num {
+    position: absolute;
+    top: -8px; right: -8px;
+    width: 20px; height: 20px;
+    background: var(--gold);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--night);
+    font-weight: 700;
+  }
+
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--star);
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    font-size: 0.8rem;
+    color: var(--mist);
+    line-height: 1.6;
+  }
+
+  /* ── BUNDLE OFFER ── */
+  .bundle-section {
+    background: linear-gradient(135deg, var(--deep) 0%, var(--ink) 100%);
+    border-top: 1px solid rgba(201,169,110,0.15);
+    border-bottom: 1px solid rgba(201,169,110,0.15);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bundle-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,110,0.06), transparent 60%);
+    pointer-events: none;
+  }
+
+  .bundle-box {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--night);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 4px;
+    padding: 3rem;
+    position: relative;
+  }
+
+  .bundle-tag {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--night);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.5rem;
+    border-radius: 2px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .bundle-items {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .bundle-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--deep);
+    border-radius: 4px;
+    border: 1px solid rgba(200,212,232,0.06);
+    min-width: 120px;
+  }
+
+  .bundle-item-emoji { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+  .bundle-item-name { font-size: 0.75rem; color: var(--moon); }
+  .bundle-item-price { font-size: 0.7rem; color: var(--mist); text-decoration: line-through; }
+
+  .bundle-plus {
+    display: flex;
+    align-items: center;
+    color: var(--gold);
+    font-size: 1.5rem;
+    opacity: 0.5;
+    padding-top: 1rem;
+  }
+
+  .bundle-total {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--gold);
+    margin: 1rem 0 0.5rem;
+  }
+
+  .bundle-savings-badge {
+    display: inline-block;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.3);
+    color: var(--gold);
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+  }
+
+  /* ── FAQ ── */
+  .faq-section {
+    background: var(--night);
+  }
+
+  .faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid rgba(200,212,232,0.08);
+    overflow: hidden;
+  }
+
+  .faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+    background: none;
+    border: none;
+    color: var(--star);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    gap: 1rem;
+    transition: color 0.3s;
+  }
+  .faq-question:hover { color: var(--gold); }
+
+  .faq-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,169,110,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    font-size: 0.87rem;
+    color: var(--mist);
+    line-height: 1.8;
+  }
+
+  .faq-item.open .faq-answer { max-height: 300px; }
+
+  .faq-answer-inner { padding: 0 0 1.5rem; }
+
+  /* ── ABOUT / BRAND ── */
+  .about-section {
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 300;
+    color: var(--star);
+    line-height: 1.4;
+    font-style: italic;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .about-quote::before {
+    content: '"';
+    font-size: 8rem;
+    color: var(--gold);
+    opacity: 0.1;
+    position: absolute;
+    top: -3rem;
+    left: -2rem;
+    font-family: var(--font-display);
+    line-height: 1;
+  }
+
+  .about-text {
+    font-size: 0.9rem;
+    color: var(--mist);
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .about-img-box {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: linear-gradient(160deg, var(--ink), var(--deep));
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-img-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(12,15,20,0.8));
+  }
+
+  .about-corner {
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 60px;
+    border-top: 2px solid rgba(201,169,110,0.4);
+    border-left: 2px solid rgba(201,169,110,0.4);
+  }
+
+  .about-corner.br {
+    top: auto; left: auto;
+    bottom: 0; right: 0;
+    border-top: none; border-left: none;
+    border-bottom: 2px solid rgba(201,169,110,0.4);
+    border-right: 2px solid rgba(201,169,110,0.4);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--night);
+    border-top: 1px solid rgba(200,212,232,0.06);
+    padding: 4rem;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.82rem;
+    color: var(--mist);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-socials {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .social-btn {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,212,232,0.12);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--mist);
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .footer-col h4 {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--star);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-col ul { list-style: none; }
+
+  .footer-col li { margin-bottom: 0.8rem; }
+
+  .footer-col a {
+    font-size: 0.82rem;
+    color: var(--mist);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-col a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(200,212,232,0.06);
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--mist);
+  }
+
+  .footer-trust {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--mist);
+  }
+
+  /* ── STICKY CTA (mobile) ── */
+  .sticky-cta {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--deep);
+    border-top: 1px solid rgba(201,169,110,0.2);
+    padding: 1rem 1.5rem;
+    z-index: 900;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .sticky-price {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--gold);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+
+    .nav-menu-open .nav-links {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0;
+      background: var(--night);
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      z-index: 999;
+    }
+    .nav-menu-open .nav-links a { font-size: 1rem; }
+
+    section { padding: 5rem 1.5rem; }
+
+    .hero { padding: 7rem 1.5rem 3rem; }
+    .hero-trust { position: relative; bottom: auto; left: auto; transform: none; flex-wrap: wrap; justify-content: center; margin-top: 2rem; gap: 1rem; }
+
+    .proof-bar { padding: 1.5rem; flex-wrap: wrap; gap: 1.5rem; }
+    .proof-divider { display: none; }
+
+    .hero-product { grid-template-columns: 1fr; gap: 3rem; }
+    .product-detail { padding-left: 0; }
+    .floating-review { right: 0; bottom: 0; }
+
+    .benefits-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .circle-art { width: 280px; height: 280px; }
+
+    .testimonials-grid { grid-template-columns: 1fr; }
+
+    .steps-row { grid-template-columns: 1fr 1fr; }
+    .steps-row::before { display: none; }
+
+    .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .about-visual { order: -1; }
+    .about-img-box { aspect-ratio: 4/3; }
+
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    .footer-trust { flex-wrap: wrap; justify-content: center; }
+
+    .sticky-cta { display: flex; }
+    footer { padding-bottom: 6rem; }
+  }
+
+  @media (max-width: 480px) {
+    .steps-row { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .bundle-items { flex-direction: column; align-items: center; }
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-line {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mist);
+    animation: fadeUp 1s ease both 1.3s;
+  }
+
+  .scroll-track {
+    width: 1px;
+    height: 50px;
+    background: rgba(200,212,232,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scroll-thumb {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 20px;
+    background: var(--gold);
+    animation: scrollDown 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollDown {
+    0% { top: -20px; opacity: 0; }
+    30% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { top: 50px; opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Lumès</a>
+  <ul class="nav-links">
+    <li><a href="#produits">Collection</a></li>
+    <li><a href="#bienfaits">Bienfaits</a></li>
+    <li><a href="#avis">Avis</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#produits" class="nav-cta">Commander</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="stars" id="stars"></div>
+
+  <div style="position:relative;z-index:1;max-width:800px;">
+    <p class="hero-eyebrow">Sleep Technology · Bien-être · 2026</p>
+    <h1 class="hero-title">
+      Révèle ton<br><em>sommeil idéal</em>
+    </h1>
+    <p class="hero-sub">
+      Des accessoires de sommeil premium conçus pour transformer vos nuits — moins de stress, plus de récupération, une énergie retrouvée.
+    </p>
+    <div class="hero-actions">
+      <a href="#produits" class="btn-primary">Découvrir la collection</a>
+      <a href="#bienfaits" class="btn-ghost">En savoir plus</a>
+    </div>
+  </div>
+
+  <div class="hero-trust">
+    <div class="trust-item">⭐ 4.9/5 — 2 300+ avis</div>
+    <div class="trust-dot"></div>
+    <div class="trust-item">🚚 Livraison 5–8j en France</div>
+    <div class="trust-dot"></div>
+    <div class="trust-item">🔄 Retours 30 jours offerts</div>
+  </div>
+
+  <div class="scroll-line">
+    <div class="scroll-track"><div class="scroll-thumb"></div></div>
+    Scroll
+  </div>
+</section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-stat">
+    <span class="proof-number">2 300+</span>
+    <span class="proof-label">Clients satisfaits</span>
+  </div>
+  <div class="proof-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-number">4.9★</span>
+    <span class="proof-label">Note moyenne</span>
+  </div>
+  <div class="proof-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-number">87%</span>
+    <span class="proof-label">Dorment mieux dès la 1re nuit</span>
+  </div>
+  <div class="proof-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-number">30j</span>
+    <span class="proof-label">Satisfaction garantie</span>
+  </div>
+</div>
+
+<!-- HERO PRODUCT -->
+<section style="background:var(--night);padding:8rem 4rem;" id="produit-vedette">
+  <div class="hero-product">
+    <div class="product-visual reveal">
+      <div class="product-main-img">
+        <div class="product-glow"></div>
+        <span style="position:relative;z-index:1;">😴</span>
+      </div>
+      <div class="product-floating floating-review">
+        <div class="stars-row">★★★★★</div>
+        <div class="floating-text">"Enfin je dors toute la nuit sans me réveiller"</div>
+        <div class="floating-author">— Marie L., Lyon · Acheteur vérifié</div>
+      </div>
+    </div>
+
+    <div class="product-detail reveal">
+      <div class="section-eyebrow">Produit vedette</div>
+      <h2 class="section-title" style="font-size:clamp(2rem,4vw,3rem);">Masque Sommeil<br><em>Gravity Pro™</em></h2>
+
+      <div class="product-detail-price">
+        49,90€ <span>79,90€</span>
+      </div>
+      <div class="product-savings">— Économisez 37% · Offre limitée</div>
+
+      <ul class="product-features">
+        <li>
+          <div class="feature-icon">✓</div>
+          <div>Pression douce sur les points d'acupression — endormissement en moins de 10 min</div>
+        </li>
+        <li>
+          <div class="feature-icon">✓</div>
+          <div>Mousse mémoire de forme thermorégulante — zéro pression sur les yeux</div>
+        </li>
+        <li>
+          <div class="feature-icon">✓</div>
+          <div>Tissu en bambou certifié OEKO-TEX® — doux, respirant, hypoallergénique</div>
+        </li>
+        <li>
+          <div class="feature-icon">✓</div>
+          <div>Blocage lumineux 100% — idéal pour décalage horaire et siestes</div>
+        </li>
+        <li>
+          <div class="feature-icon">✓</div>
+          <div>Livraison offerte en France · Retours 30 jours gratuits</div>
+        </li>
+      </ul>
+
+      <div class="buy-section">
+        <div class="quantity-row">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-display" id="qty">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+          <span style="font-size:0.8rem;color:var(--mist);">Achetez 2 = −10% supplémentaire</span>
+        </div>
+        <button class="btn-primary" style="width:100%;text-align:center;padding:1.2rem;" onclick="addToCart()">
+          🛒 Ajouter au panier — 49,90€
+        </button>
+        <button class="btn-ghost" style="width:100%;text-align:center;padding:1.2rem;" onclick="buyNow()">
+          ⚡ Acheter maintenant
+        </button>
+        <div class="guarantee">
+          🔒 Paiement sécurisé SSL · 🛡️ Garantie 30 jours · 📦 Livraison 5–8j
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS GRID -->
+<section class="products-section" id="produits">
+  <div class="products-header reveal">
+    <div class="section-eyebrow" style="justify-content:center;">Notre collection</div>
+    <h2 class="section-title">Chaque produit,<br><em>une transformation</em></h2>
+    <p style="color:var(--mist);font-size:0.9rem;">Des solutions premium pour chaque aspect de votre sommeil.</p>
+  </div>
+
+  <div class="products-grid">
+
+    <!-- P1 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1C2130,#0C0F14);"></div>
+        <div class="product-badge">Best-seller</div>
+        <span style="position:relative;z-index:1;">😴</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Gravity Pro™</div>
+        <div class="product-desc">Masque de sommeil lestée avec points d'acupression. Endormissement accéléré garanti.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">49,90€</span>
+            <span class="product-price-old">79,90€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1A1F2E,#131720);"></div>
+        <div class="product-badge">Nouveau</div>
+        <span style="position:relative;z-index:1;">🌙</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Drift Pillow™</div>
+        <div class="product-desc">Oreiller ergonomique en latex naturel pour alignement cervical parfait et sans douleurs.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">69,90€</span>
+            <span class="product-price-old">110€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P3 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1C2130,#152030);"></div>
+        <div class="product-badge">Viral TikTok</div>
+        <span style="position:relative;z-index:1;">🧘</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">NightRoll™</div>
+        <div class="product-desc">Rouleau de massage cervical chauffant pour décompresser et préparer le corps au sommeil.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">39,90€</span>
+            <span class="product-price-old">59,90€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P4 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1A1830,#0C0F14);"></div>
+        <span style="position:relative;z-index:1;">🔊</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">SoundVeil™</div>
+        <div class="product-desc">Masque sommeil avec haut-parleurs intégrés ultra-plats pour méditations et bruits blancs.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">64,90€</span>
+            <span class="product-price-old">99€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P5 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1C2418,#0C0F14);"></div>
+        <span style="position:relative;z-index:1;">🌡️</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">CoolPad™</div>
+        <div class="product-desc">Coussin réfrigérant réutilisable pour positionner sous les pieds ou la nuque. Effet immédiat.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">29,90€</span>
+            <span class="product-price-old">44,90€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P6 -->
+    <div class="product-card reveal">
+      <div class="product-img">
+        <div class="product-img-bg" style="background:linear-gradient(135deg,#1C1820,#0C0F14);"></div>
+        <div class="product-badge">Pack complet</div>
+        <span style="position:relative;z-index:1;">✨</span>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Sleep Kit™</div>
+        <div class="product-desc">Le coffret complet : masque Gravity Pro + bouchons en silicone moulés + spray relaxant.</div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">89,90€</span>
+            <span class="product-price-old">149,70€</span>
+          </div>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits-section" id="bienfaits">
+  <div class="benefits-grid">
+    <div>
+      <div class="section-eyebrow">Pourquoi Lumès</div>
+      <h2 class="section-title">La science du<br><em>sommeil profond</em></h2>
+      <p style="color:var(--mist);font-size:0.9rem;margin-bottom:3rem;line-height:1.8;">
+        Nous avons collaboré avec des spécialistes du sommeil pour concevoir des produits qui agissent réellement — pas des gadgets, des solutions.
+      </p>
+
+      <div class="benefit-item">
+        <div class="benefit-num">01</div>
+        <div class="benefit-text">
+          <h3>Endormissement en 10 minutes</h3>
+          <p>La pression douce des masques lestés stimule le système parasympathique, réduisant l'anxiété et accélérant l'endormissement naturellement.</p>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-num">02</div>
+        <div class="benefit-text">
+          <h3>Réveil sans douleurs</h3>
+          <p>L'alignement cervical optimal de nos oreillers ergonomiques prévient les tensions musculaires nocturnes — votre corps se réveille léger.</p>
+        </div>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-num">03</div>
+        <div class="benefit-text">
+          <h3>Énergie multipliée</h3>
+          <p>Une nuit de sommeil profond = jusqu'à 40% de productivité en plus le lendemain. Nos clients le constatent dès la première semaine.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="benefits-visual reveal">
+      <div class="circle-art">
+        <div class="circle-inner">🌙</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="methode">
+  <div style="text-align:center;max-width:600px;margin:0 auto 5rem;" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center;">Méthode Lumès</div>
+    <h2 class="section-title">Transformez vos nuits<br><em>en 4 étapes</em></h2>
+  </div>
+
+  <div class="steps-row">
+    <div class="step-card reveal">
+      <div class="step-icon">
+        🛍️
+        <div class="step-num">1</div>
+      </div>
+      <div class="step-title">Commandez</div>
+      <p class="step-desc">Choisissez votre kit. Livraison en 5–8 jours ouvrés en France, emballage premium cadeau.</p>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">
+        📦
+        <div class="step-num">2</div>
+      </div>
+      <div class="step-title">Installez</div>
+      <p class="step-desc">Guide de démarrage inclus. En 3 minutes, votre environnement de sommeil est optimisé.</p>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">
+        😴
+        <div class="step-num">3</div>
+      </div>
+      <div class="step-title">Dormez</div>
+      <p class="step-desc">Ressentez la différence dès la première nuit. 87% de nos clients dorment mieux immédiatement.</p>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-icon">
+        ⚡
+        <div class="step-num">4</div>
+      </div>
+      <div class="step-title">Vibrez</div>
+      <p class="step-desc">Réveil naturel, énergie retrouvée. Profitez d'une journée au sommet de votre potentiel.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="avis">
+  <div style="text-align:center;max-width:600px;margin:0 auto 4rem;" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center;">Témoignages</div>
+    <h2 class="section-title">Ils ont retrouvé<br><em>le sommeil</em></h2>
+  </div>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="testimonial-quote">"</div>
+      <p class="testimonial-text">J'ai essayé tout ce qu'on m'a recommandé pendant 5 ans. Le masque Gravity Pro est la seule chose qui m'a vraiment aidée à m'endormir sans médicament. Je ne peux plus m'en passer.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">👩</div>
+        <div>
+          <span class="author-name">Camille R.</span>
+          <span class="author-detail stars-gold">★★★★★</span>
+          <span class="author-detail"> · Strasbourg</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal">
+      <div class="testimonial-quote">"</div>
+      <p class="testimonial-text">En tant que médecin aux urgences avec des horaires décalés, le sommeil est vital. Le masque SoundVeil avec mes playlists de bruits blancs a littéralement sauvé mes nuits.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">👨‍⚕️</div>
+        <div>
+          <span class="author-name">Dr. Antoine M.</span>
+          <span class="author-detail stars-gold">★★★★★</span>
+          <span class="author-detail"> · Paris</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal">
+      <div class="testimonial-quote">"</div>
+      <p class="testimonial-text">Le Sleep Kit en coffret cadeau pour ma mère. Elle m'a appelée le lendemain pour me dire qu'elle avait dormi 8h d'affilée pour la première fois depuis des années. Les larmes aux yeux.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">👩‍💼</div>
+        <div>
+          <span class="author-name">Sofia K.</span>
+          <span class="author-detail stars-gold">★★★★★</span>
+          <span class="author-detail"> · Bordeaux</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUNDLE OFFER -->
+<section class="bundle-section">
+  <div style="text-align:center;max-width:600px;margin:0 auto 4rem;" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center;">Offre exclusive</div>
+    <h2 class="section-title">Le <em>Sleep Kit™</em><br>complet</h2>
+    <p style="color:var(--mist);font-size:0.9rem;">Tout ce dont vous avez besoin pour transformer vos nuits, en un seul coffret premium.</p>
+  </div>
+
+  <div class="bundle-box reveal">
+    <div class="bundle-tag">✨ Économisez 60€ — Offre limitée</div>
+
+    <div class="bundle-items">
+      <div class="bundle-item">
+        <span class="bundle-item-emoji">😴</span>
+        <div class="bundle-item-name">Gravity Pro™</div>
+        <div class="bundle-item-price">49,90€</div>
+      </div>
+      <div class="bundle-plus">+</div>
+      <div class="bundle-item">
+        <span class="bundle-item-emoji">🔇</span>
+        <div class="bundle-item-name">Bouchons SilentPro™</div>
+        <div class="bundle-item-price">29,90€</div>
+      </div>
+      <div class="bundle-plus">+</div>
+      <div class="bundle-item">
+        <span class="bundle-item-emoji">🌿</span>
+        <div class="bundle-item-name">Spray Nuit™</div>
+        <div class="bundle-item-price">24,90€</div>
+      </div>
+      <div class="bundle-plus">+</div>
+      <div class="bundle-item">
+        <span class="bundle-item-emoji">🎁</span>
+        <div class="bundle-item-name">Coffret premium</div>
+        <div class="bundle-item-price">Offert</div>
+      </div>
+    </div>
+
+    <div class="bundle-total">89,90€</div>
+    <div class="bundle-savings-badge">au lieu de 149,70€ — 40% d'économie</div>
+
+    <button class="btn-primary" style="padding:1.2rem 3rem;font-size:0.9rem;" onclick="buyNow()">
+      🛒 Commander le Sleep Kit™
+    </button>
+    <p style="font-size:0.75rem;color:var(--mist);margin-top:1rem;">
+      🔒 Paiement sécurisé · 📦 Livraison 5–8j · 🔄 Retours 30j gratuits
+    </p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div style="max-width:600px;margin:0 auto 4rem;" class="reveal">
+    <div class="section-eyebrow">Questions fréquentes</div>
+    <h2 class="section-title">Vous avez des<br><em>questions ?</em></h2>
+  </div>
+
+  <div class="faq-container">
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Les produits Lumès conviennent-ils à tous ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oui, nos produits sont conçus pour tous les profils de dormeurs. Que vous souffriez d'insomnie légère, de stress au coucher, de douleurs cervicales ou simplement que vous souhaitiez optimiser la qualité de votre récupération, nos solutions s'adaptent à vous. En cas de pathologie médicale grave du sommeil, nous vous recommandons de consulter un spécialiste en parallèle.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Quand verrai-je des résultats ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          87% de nos clients rapportent une amélioration dès la première nuit. Pour des résultats durables, nous recommandons une utilisation régulière sur 7 jours. En 2 semaines, la majorité de nos clients constatent une transformation profonde de leur qualité de sommeil — et donc de leur énergie diurne.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Comment fonctionne la garantie 30 jours ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Simple : si vous n'êtes pas satisfait pour quelque raison que ce soit dans les 30 jours suivant la réception, contactez-nous par email. Nous organisons le retour à nos frais et vous remboursons intégralement sous 48h. Pas de questions, pas de formulaires complexes.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Quels sont les délais de livraison ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Livraison en France métropolitaine en 5 à 8 jours ouvrés. Vous recevrez un email de confirmation avec numéro de suivi dès l'expédition. Pour la Belgique, Suisse et Luxembourg, comptez 7–10 jours. Livraison internationale disponible sur demande.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Les matériaux sont-ils certifiés et sûrs ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Absolument. Tous nos textiles sont certifiés OEKO-TEX® Standard 100 — sans substances nocives, testés dermatologiquement. Nos mousses mémoire de forme sont sans formaldéhyde. Nos produits respectent toutes les normes européennes CE en vigueur.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item reveal">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Puis-je laver les produits Lumès ?
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Oui ! Les housses de nos masques et oreillers sont amovibles et lavables en machine à 30°C. Nous recommandons un lavage hebdomadaire pour une hygiène optimale. Les roulettes et coussins sont nettoyables à l'eau tiède avec un chiffon doux.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Notre histoire</div>
+      <blockquote class="about-quote">
+        "Nous avons créé Lumès parce que le sommeil était notre ennemi — aujourd'hui c'est notre superpouvoir."
+      </blockquote>
+      <p class="about-text">
+        Lumès est née d'une frustration personnelle. Après des années à chercher des solutions efficaces contre l'insomnie et la fatigue chronique, nous avons décidé de créer les produits que nous aurions voulu trouver nous-mêmes.
+      </p>
+      <p class="about-text">
+        Chaque produit est le résultat d'une collaboration avec des spécialistes du sommeil et de centaines d'heures de tests. Nous ne vendons que ce que nous utilisons nous-mêmes, chaque nuit.
+      </p>
+      <p class="about-text">
+        Notre mission : démocratiser l'accès à un sommeil de qualité premium — sans ordonnance, sans artifice, sans compromis.
+      </p>
+      <a href="#produits" class="btn-primary" style="display:inline-block;margin-top:1rem;">
+        Découvrir la collection
+      </a>
+    </div>
+
+    <div class="about-visual reveal">
+      <div class="about-img-box">
+        <div class="about-corner"></div>
+        <div class="about-corner br"></div>
+        <span style="position:relative;z-index:1;">🌙</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <a href="#" class="footer-logo">Lumès</a>
+      <p class="footer-tagline">Des nuits transformées,<br>des jours extraordinaires.<br>Dormez mieux. Vivez mieux.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn" aria-label="TikTok">📱</a>
+        <a href="#" class="social-btn" aria-label="Instagram">📸</a>
+        <a href="#" class="social-btn" aria-label="Facebook">👥</a>
+        <a href="#" class="social-btn" aria-label="Email">✉️</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Collection</h4>
+      <ul>
+        <li><a href="#">Gravity Pro™</a></li>
+        <li><a href="#">Drift Pillow™</a></li>
+        <li><a href="#">NightRoll™</a></li>
+        <li><a href="#">SoundVeil™</a></li>
+        <li><a href="#">Sleep Kit™</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Informations</h4>
+      <ul>
+        <li><a href="#">Notre histoire</a></li>
+        <li><a href="#">La science du sommeil</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Presse</a></li>
+        <li><a href="#">Affiliés</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Service client</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Livraison & retours</a></li>
+        <li><a href="#">Garantie</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Mentions légales</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Lumès SAS — Tous droits réservés</span>
+    <div class="footer-trust">
+      <div class="trust-badge">🔒 SSL Sécurisé</div>
+      <div class="trust-badge">💳 CB / PayPal / Apple Pay</div>
+      <div class="trust-badge">🇫🇷 Service client en français</div>
+      <div class="trust-badge">♻️ Emballages éco-responsables</div>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY CTA MOBILE -->
+<div class="sticky-cta" id="stickyCta">
+  <div>
+    <div class="sticky-price">49,90€</div>
+    <div style="font-size:0.7rem;color:var(--mist);">Gravity Pro™ · Livraison offerte</div>
+  </div>
+  <button class="btn-primary" onclick="buyNow()">Commander →</button>
+</div>
+
+<!-- CART NOTIFICATION -->
+<div id="cartNotif" style="
+  position:fixed;bottom:80px;right:1.5rem;
+  background:var(--ink);border:1px solid rgba(201,169,110,0.4);
+  color:var(--star);padding:1rem 1.5rem;border-radius:4px;
+  font-size:0.85rem;z-index:9998;
+  transform:translateY(100px);opacity:0;
+  transition:all 0.4s ease;
+  max-width:280px;
+">
+  ✅ Produit ajouté au panier !
+</div>
+
+<script>
+  // Generate stars
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-dot';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width:${size}px;height:${size}px;
+      top:${Math.random()*100}%;left:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;
+      --delay:${Math.random()*5}s;
+      --op-min:${0.05+Math.random()*0.15};
+      --op-max:${0.4+Math.random()*0.6};
+    `;
+    starsContainer.appendChild(s);
+  }
+
+  // Intersection observer for reveals
+  const revealEls = document.querySelectorAll('.reveal, .benefit-item');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  revealEls.forEach(el => observer.observe(el));
+
+  // Stagger reveal items
+  document.querySelectorAll('.benefit-item').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.15}s`;
+  });
+
+  // FAQ
+  function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Quantity
+  let qty = 1;
+  function changeQty(dir) {
+    qty = Math.max(1, Math.min(10, qty + dir));
+    document.getElementById('qty').textContent = qty;
+    const btn = document.querySelector('.buy-section .btn-primary');
+    const price = (49.90 * qty * (qty >= 2 ? 0.9 : 1)).toFixed(2);
+    btn.textContent = `🛒 Ajouter au panier — ${price.replace('.', ',')}€`;
+  }
+
+  // Cart notif
+  function showCartNotif() {
+    const n = document.getElementById('cartNotif');
+    n.style.transform = 'translateY(0)';
+    n.style.opacity = '1';
+    setTimeout(() => {
+      n.style.transform = 'translateY(100px)';
+      n.style.opacity = '0';
+    }, 3000);
+  }
+
+  function addToCart() {
+    showCartNotif();
+    const btn = document.querySelector('.buy-section .btn-primary');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Ajouté !';
+    btn.style.background = '#2d5a27';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 2000);
+  }
+
+  function buyNow() {
+    alert('🚀 Redirection vers le paiement sécurisé...\n\n(Intégrez ici votre Stripe / Shopify Checkout)');
+  }
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const body = document.body;
+  hamburger.addEventListener('click', () => {
+    body.classList.toggle('nav-menu-open');
+  });
+
+  // Navbar scroll behavior
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 100) {
+      nav.style.background = 'rgba(12,15,20,0.97)';
+    } else {
+      nav.style.background = '';
+    }
+  });
+
+  // Add to cart buttons on product grid
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      showCartNotif();
+      btn.textContent = '✓ Ajouté';
+      btn.style.background = 'var(--gold)';
+      btn.style.color = 'var(--night)';
+      setTimeout(() => {
+        btn.textContent = 'Ajouter';
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 2000);
+    });
+  });
+</script>
+
+</body>
+</html>
