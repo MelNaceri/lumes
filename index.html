@@ -461,6 +461,151 @@ footer {
 .rv { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
 .rv.on { opacity: 1; transform: translateY(0); }
 @keyframes fu { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+
+/* ===================== PANIER ===================== */
+.nav-right { display: flex; align-items: center; gap: 0.8rem; }
+
+.cart-btn {
+  position: relative;
+  background: none; border: none;
+  cursor: pointer; padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--moon);
+}
+.cart-btn svg { display: block; }
+.cart-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 17px; height: 17px;
+  background: var(--gold); color: var(--night);
+  border-radius: 50%; font-size: 10px; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+  font-family: var(--fb);
+}
+.cart-badge.on { display: flex; }
+
+/* Overlay fond */
+.cart-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+}
+.cart-overlay.on { display: block; }
+
+/* Panneau */
+.cart-panel {
+  position: fixed; top: 0; right: -110%;
+  width: min(380px, 100vw); height: 100%;
+  background: var(--deep);
+  border-left: 1px solid rgba(200,212,232,0.08);
+  z-index: 201;
+  display: flex; flex-direction: column;
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+.cart-panel.on { right: 0; }
+
+.cp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid rgba(200,212,232,0.08);
+  flex-shrink: 0;
+}
+.cp-title {
+  font-family: var(--fd); font-size: 1.4rem;
+  font-weight: 300; color: var(--star); letter-spacing: 0.1em;
+}
+.cp-close {
+  background: none; border: none;
+  color: var(--mist); font-size: 1.5rem;
+  cursor: pointer; line-height: 1; padding: 4px;
+}
+.cp-close:hover { color: var(--star); }
+
+/* Liste articles */
+.cp-items {
+  flex: 1; overflow-y: auto; padding: 1rem 1.3rem;
+}
+.cp-empty {
+  text-align: center; padding: 3rem 1rem;
+  color: var(--mist); font-size: 0.88rem; line-height: 1.8;
+}
+.cp-empty-ico { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; opacity: 0.4; }
+
+.cp-item {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(200,212,232,0.06);
+}
+.cp-item:last-child { border-bottom: none; }
+.cp-item-ico {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: var(--ink); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+.cp-item-info { flex: 1; min-width: 0; }
+.cp-item-name {
+  font-family: var(--fd); font-size: 0.95rem; color: var(--star);
+  margin-bottom: 0.15rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cp-item-price { font-size: 0.8rem; color: var(--gold); }
+.cp-item-ctrl { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+.cp-qb {
+  width: 24px; height: 24px;
+  background: var(--ink); border: 1px solid rgba(200,212,232,0.15);
+  color: var(--star); font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 2px;
+}
+.cp-qb:active { border-color: var(--gold); color: var(--gold); }
+.cp-qn { font-size: 0.88rem; min-width: 1.2rem; text-align: center; color: var(--star); }
+.cp-rm {
+  background: none; border: none;
+  color: rgba(200,212,232,0.2); font-size: 1rem;
+  cursor: pointer; padding: 2px; margin-left: 2px;
+  line-height: 1;
+}
+.cp-rm:hover { color: #e24b4a; }
+
+/* Footer panier */
+.cp-foot {
+  border-top: 1px solid rgba(200,212,232,0.08);
+  padding: 1.1rem 1.3rem;
+  padding-bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+}
+.cp-row {
+  display: flex; justify-content: space-between;
+  font-size: 0.8rem; color: var(--mist); margin-bottom: 0.4rem;
+}
+.cp-row.total {
+  font-family: var(--fd); font-size: 1.2rem;
+  color: var(--star); margin: 0.7rem 0 1rem;
+}
+.cp-row.total span:last-child { color: var(--gold); font-size: 1.5rem; }
+.cp-checkout {
+  width: 100%; background: var(--gold); color: var(--night);
+  border: none; border-radius: 2px; padding: 0.95rem;
+  font-family: var(--fb); font-size: 0.82rem;
+  font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.6rem;
+}
+.cp-checkout:active { background: var(--gold2); }
+.cp-cont {
+  width: 100%; background: transparent;
+  border: 1px solid rgba(200,212,232,0.15);
+  color: var(--mist); border-radius: 2px; padding: 0.75rem;
+  font-family: var(--fb); font-size: 0.75rem;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+}
+.cp-cont:active { color: var(--star); border-color: rgba(200,212,232,0.3); }
+.cp-guar {
+  text-align: center; font-size: 0.65rem;
+  color: var(--mist); margin-top: 0.75rem; line-height: 1.6;
+}
+
 </style>
 </head>
 <body>
@@ -468,7 +613,17 @@ footer {
 <!-- NAV -->
 <nav>
   <a href="#" class="logo">Lumès</a>
+  <div class="nav-right">
+  <button class="cart-btn" id="cartBtn" onclick="openCart()" aria-label="Panier">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
+    </svg>
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
   <button class="burger" id="bburger"><span></span><span></span><span></span></button>
+</div>
 </nav>
 
 <!-- MENU MOBILE -->
@@ -689,6 +844,33 @@ footer {
 </footer>
 
 <!-- STICKY CTA -->
+
+<!-- OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- PANNEAU PANIER -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cp-head">
+    <div class="cp-title">Mon panier</div>
+    <button class="cp-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cp-items" id="cpItems">
+    <div class="cp-empty">
+      <span class="cp-empty-ico">🛒</span>
+      Votre panier est vide<br>
+      <span style="font-size:0.78rem;opacity:0.6">Ajoutez des produits pour commencer</span>
+    </div>
+  </div>
+  <div class="cp-foot" id="cpFoot" style="display:none">
+    <div class="cp-row"><span>Sous-total</span><span id="cpSub">0,00€</span></div>
+    <div class="cp-row"><span>Livraison</span><span style="color:var(--gold)">Offerte</span></div>
+    <div class="cp-row total"><span>Total</span><span id="cpTotal">0,00€</span></div>
+    <button class="cp-checkout" onclick="checkout()">🔒 Commander — <span id="cpTotalBtn">0,00€</span></button>
+    <button class="cp-cont" onclick="closeCart()">Continuer mes achats</button>
+    <div class="cp-guar">🔒 Paiement sécurisé SSL · 🛡️ Satisfait ou remboursé 30j</div>
+  </div>
+</div>
+
 <div class="sticky">
   <div>
     <div class="sticky-price">49,90€</div>
@@ -726,6 +908,95 @@ function tfaq(btn){
   if(!open)it.classList.add('open');
 }
 
+// ===== PANIER =====
+var cart = [];
+var PRODS = {
+  'gp':  {name:'Gravity Pro™',  ico:'😴', price:49.90},
+  'dp':  {name:'Drift Pillow™', ico:'🌙', price:69.90},
+  'nr':  {name:'NightRoll™',    ico:'🧘', price:39.90},
+  'sv':  {name:'SoundVeil™',    ico:'🔊', price:64.90},
+  'cp':  {name:'CoolPad™',      ico:'🌡️', price:29.90},
+  'sk':  {name:'Sleep Kit™',    ico:'✨', price:89.90},
+};
+
+function openCart()  { document.getElementById('cartPanel').classList.add('on'); document.getElementById('cartOverlay').classList.add('on'); }
+function closeCart() { document.getElementById('cartPanel').classList.remove('on'); document.getElementById('cartOverlay').classList.remove('on'); }
+
+function addById(id) {
+  var p = PRODS[id]; if(!p) return;
+  var ex = null;
+  for(var i=0;i<cart.length;i++){ if(cart[i].id===id){ex=cart[i];break;} }
+  if(ex){ ex.qty++; } else { cart.push({id:id,name:p.name,ico:p.ico,price:p.price,qty:1}); }
+  renderCart(); updateBadge(); showNotif(p.name);
+  setTimeout(openCart, 350);
+}
+
+function removeItem(id) {
+  cart = cart.filter(function(i){return i.id!==id;});
+  renderCart(); updateBadge();
+}
+
+function changeQty(id, d) {
+  for(var i=0;i<cart.length;i++){
+    if(cart[i].id===id){ cart[i].qty+=d; if(cart[i].qty<=0){removeItem(id);return;} break; }
+  }
+  renderCart(); updateBadge();
+}
+
+function renderCart() {
+  var el=document.getElementById('cpItems');
+  var foot=document.getElementById('cpFoot');
+  if(cart.length===0){
+    el.innerHTML='<div class="cp-empty"><span class="cp-empty-ico">🛒</span>Votre panier est vide<br><span style="font-size:0.78rem;opacity:0.6">Ajoutez des produits pour commencer</span></div>';
+    foot.style.display='none'; return;
+  }
+  foot.style.display='block';
+  var total=0; var html='';
+  for(var i=0;i<cart.length;i++){
+    var it=cart[i]; total+=it.price*it.qty;
+    html+='<div class="cp-item">'+
+      '<div class="cp-item-ico">'+it.ico+'</div>'+
+      '<div class="cp-item-info">'+
+        '<div class="cp-item-name">'+it.name+'</div>'+
+        '<div class="cp-item-price">'+(it.price*it.qty).toFixed(2).replace('.',',')+'€</div>'+
+      '</div>'+
+      '<div class="cp-item-ctrl">'+
+        '<button class="cp-qb" onclick="changeQty(''+it.id+'',-1)">−</button>'+
+        '<span class="cp-qn">'+it.qty+'</span>'+
+        '<button class="cp-qb" onclick="changeQty(''+it.id+'',1)">+</button>'+
+      '</div>'+
+      '<button class="cp-rm" onclick="removeItem(''+it.id+'')">✕</button>'+
+    '</div>';
+  }
+  el.innerHTML=html;
+  var fmt=total.toFixed(2).replace('.',',')+'€';
+  document.getElementById('cpSub').textContent=fmt;
+  document.getElementById('cpTotal').textContent=fmt;
+  document.getElementById('cpTotalBtn').textContent=fmt;
+}
+
+function updateBadge() {
+  var n=cart.reduce(function(s,i){return s+i.qty;},0);
+  var b=document.getElementById('cartBadge');
+  b.textContent=n;
+  if(n>0){b.classList.add('on');}else{b.classList.remove('on');}
+}
+
+function checkout() {
+  if(cart.length===0) return;
+  var total=cart.reduce(function(s,i){return s+i.price*i.qty;},0);
+  alert('Intégrez ici votre lien Stripe ou Shopify Checkout.\nTotal : '+total.toFixed(2)+'€');
+}
+
+// Notif
+function showNotif(name) {
+  var n=document.getElementById('cnotif');
+  n.textContent='✅ '+name+' ajouté !';
+  n.classList.add('show');
+  setTimeout(function(){n.classList.remove('show');},2500);
+}
+
+// Quantité produit vedette
 var qty=1;
 function cq(d){
   qty=Math.max(1,Math.min(10,qty+d));
@@ -734,28 +1005,16 @@ function cq(d){
   document.getElementById('cbtn').textContent='🛒 Ajouter au panier — '+p+'€';
 }
 
-function notif(){
-  var n=document.getElementById('cnotif');
-  n.classList.add('show');
-  setTimeout(function(){n.classList.remove('show');},2500);
-}
+function addCart(){ addById('gp'); }
+function buyNow() { addById('gp'); }
 
-function addCart(){
-  notif();
-  var b=document.getElementById('cbtn'),o=b.textContent;
-  b.textContent='✓ Ajouté !';b.style.background='#2a5c25';
-  setTimeout(function(){b.textContent=o;b.style.background='';},2000);
-}
-
-function buyNow(){
-  alert('Remplacez cette alerte par votre lien Stripe ou Shopify Checkout.');
-}
-
-document.querySelectorAll('.badd').forEach(function(b){
+// Boutons grille produits
+var IDS=['gp','dp','nr','sv','cp','sk'];
+document.querySelectorAll('.badd').forEach(function(b,i){
   b.addEventListener('click',function(){
-    notif();
-    b.textContent='✓';b.style.background='var(--gold)';b.style.color='var(--night)';
-    setTimeout(function(){b.textContent='Ajouter';b.style.background='';b.style.color='';},1800);
+    addById(IDS[i]||'gp');
+    b.textContent='✓'; b.style.background='var(--gold)'; b.style.color='var(--night)';
+    setTimeout(function(){b.textContent='Ajouter';b.style.background='';b.style.color='';},1600);
   });
 });
 </script>
