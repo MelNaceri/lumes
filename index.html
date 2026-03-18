@@ -6,19 +6,24 @@
 <title>LUMÈS — Révèle ton sommeil</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+
+/* ===================== VARIABLES ===================== */
 :root {
-  --night: #0C0F14;
-  --deep: #131720;
-  --ink: #1C2130;
-  --mist: #8B96A8;
-  --moon: #C8D4E8;
-  --star: #E8EDF5;
-  --gold: #C9A96E;
-  --gold-light: #E2C98A;
+  --night:  #0C0F14;
+  --deep:   #131720;
+  --ink:    #1C2130;
+  --mist:   #8B96A8;
+  --moon:   #C8D4E8;
+  --star:   #E8EDF5;
+  --gold:   #C9A96E;
+  --gold2:  #E2C98A;
   --aurora: #5B7FA6;
   --fd: 'Cormorant Garamond', Georgia, serif;
   --fb: 'DM Sans', system-ui, sans-serif;
+  --cta-h: 72px;
 }
+
+/* ===================== BASE ===================== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
@@ -27,28 +32,27 @@ body {
   font-family: var(--fb);
   font-weight: 300;
   line-height: 1.7;
-overflow-x: hidden;
-  padding-bottom: 90px;
+  overflow-x: hidden;
+  /* espace en bas = hauteur barre sticky + safe area iPhone */
+  padding-bottom: calc(var(--cta-h) + env(safe-area-inset-bottom, 20px));
 }
 
-/* NAV — toujours fixée, fond solide */
+/* ===================== NAV ===================== */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: rgba(12,15,20,0.98);
+  background: rgba(12,15,20,0.97);
   border-bottom: 1px solid rgba(200,212,232,0.08);
-  -webkit-transform: translate3d(0,0,0);
-  transform: translate3d(0,0,0);
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  /* force le GPU — fix position:fixed sur iOS */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
-.nav-logo {
+.logo {
   font-family: var(--fd);
   font-size: 1.5rem;
   font-weight: 300;
@@ -57,1042 +61,712 @@ nav {
   text-decoration: none;
   text-transform: uppercase;
 }
-.nav-links { display: none; }
-.hamburger {
+.burger {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  cursor: pointer;
   background: none;
   border: none;
+  cursor: pointer;
   padding: 4px;
-  z-index: 1001;
+  z-index: 102;
 }
-.hamburger span {
-  width: 24px; height: 1px;
-  background: var(--moon);
-  display: block;
-  transition: 0.3s;
-}
-.mobile-menu {
+.burger span { display: block; width: 24px; height: 1px; background: var(--moon); }
+
+/* ===================== MENU MOBILE ===================== */
+.mmenu {
   display: none;
   position: fixed;
   inset: 0;
+  z-index: 101;
   background: rgba(12,15,20,0.98);
-  z-index: 999;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2rem;
 }
-.mobile-menu.open { display: flex; }
-.mobile-menu a {
+.mmenu.open { display: flex; }
+.mmenu a {
   color: var(--star);
   text-decoration: none;
   font-size: 1.3rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
-.mobile-menu a:hover { color: var(--gold); }
-.menu-close {
+.mmenu-close {
   position: absolute;
   top: 1.2rem; right: 1.5rem;
   background: none; border: none;
-  color: var(--mist); font-size: 1.8rem;
-  cursor: pointer;
+  color: var(--mist); font-size: 2rem; cursor: pointer;
 }
 
-/* HERO */
+/* ===================== HERO ===================== */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 7rem 1.5rem 2rem;
+  padding: 7rem 1.5rem 3rem;
   overflow: hidden;
 }
 .hero-bg {
   position: absolute; inset: 0;
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(91,127,166,0.15) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,169,110,0.06) 0%, transparent 60%),
     var(--night);
 }
 .stars { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .star-dot {
-  position: absolute; border-radius: 50%; background: white;
-  animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+  position: absolute; border-radius: 50%; background: #fff;
+  animation: twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);
 }
 @keyframes twinkle {
-  0%,100% { opacity: var(--mn,0.1); }
-  50% { opacity: var(--mx,0.7); }
+  0%,100% { opacity: var(--a,.1); }
+  50%      { opacity: var(--b,.6); }
 }
-.hero-inner { position: relative; z-index: 1; max-width: 600px; width: 100%; }
-.hero-eyebrow {
-  font-size: 0.65rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 1.2rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
+.hero-in { position: relative; z-index: 1; max-width: 580px; width: 100%; }
+.eyebrow {
+  font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1rem;
+  display: inline-flex; align-items: center; gap: 0.7rem;
 }
-.hero-eyebrow::before, .hero-eyebrow::after {
-  content: ''; width: 25px; height: 1px;
-  background: var(--gold); opacity: 0.5;
-}
+.eyebrow::before,.eyebrow::after { content:''; width:22px; height:1px; background:var(--gold); opacity:.5; }
 .hero-title {
   font-family: var(--fd);
-  font-size: clamp(2.6rem, 11vw, 6rem);
-  font-weight: 300;
-  line-height: 1.05;
-  color: var(--star);
-  margin-bottom: 1rem;
+  font-size: clamp(2.5rem, 11vw, 5.5rem);
+  font-weight: 300; line-height: 1.05;
+  color: var(--star); margin-bottom: 1rem;
 }
 .hero-title em { font-style: italic; color: var(--gold); }
 .hero-sub {
-  font-size: 0.95rem;
-  color: var(--mist);
-  max-width: 420px;
-  margin: 0 auto 1.8rem;
-  line-height: 1.8;
+  font-size: 0.93rem; color: var(--mist);
+  max-width: 400px; margin: 0 auto 1.6rem; line-height: 1.8;
 }
 .hero-btns {
-  display: flex;
-  gap: 0.8rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+  display: flex; gap: 0.8rem;
+  justify-content: center; flex-wrap: wrap; margin-bottom: 1.8rem;
 }
-.btn-primary {
-  background: var(--gold);
-  color: var(--night);
-  border: none;
-  padding: 0.9rem 2rem;
-  font-family: var(--fb);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: background 0.3s;
-  text-decoration: none;
+.trust-list {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.4rem;
+}
+.trust-list span { font-size: 0.75rem; color: var(--mist); }
+
+/* ===================== BOUTONS ===================== */
+.btn {
   display: inline-block;
-  font-weight: 500;
+  font-family: var(--fb); font-weight: 500;
+  font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+  border-radius: 2px; cursor: pointer;
+  text-decoration: none; border: none;
+  padding: 0.9rem 2rem; transition: background .25s, border-color .25s;
 }
-.btn-primary:hover { background: var(--gold-light); }
-.btn-ghost {
-  background: transparent;
-  color: var(--moon);
-  border: 1px solid rgba(200,212,232,0.25);
-  padding: 0.9rem 2rem;
-  font-family: var(--fb);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: inline-block;
-}
+.btn-gold  { background: var(--gold);  color: var(--night); }
+.btn-gold:hover { background: var(--gold2); }
+.btn-ghost { background: transparent; color: var(--moon); border: 1px solid rgba(200,212,232,.25); }
 .btn-ghost:hover { border-color: var(--moon); }
+.btn-full  { width: 100%; text-align: center; padding: 1rem; }
 
-/* Hero trust badges — en ligne sous les boutons */
-.hero-trust {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-.trust-item {
-  font-size: 0.75rem;
-  color: var(--mist);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-/* PROOF BAR */
+/* ===================== PROOF BAR ===================== */
 .proof-bar {
   background: var(--deep);
-  border-top: 1px solid rgba(200,212,232,0.06);
-  border-bottom: 1px solid rgba(200,212,232,0.06);
-  padding: 1.2rem 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  border-top: 1px solid rgba(200,212,232,.06);
+  border-bottom: 1px solid rgba(200,212,232,.06);
+  display: grid; grid-template-columns: repeat(2,1fr);
+  gap: 1rem; padding: 1.2rem 1.5rem;
 }
 .proof-stat { text-align: center; }
-.proof-number {
-  font-family: var(--fd);
-  font-size: 1.8rem;
-  font-weight: 300;
-  color: var(--gold);
-  display: block;
+.proof-n {
+  font-family: var(--fd); font-size: 1.8rem;
+  font-weight: 300; color: var(--gold); display: block;
 }
-.proof-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--mist);
-}
+.proof-l { font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--mist); }
 
-/* SECTIONS */
-section { padding: 4rem 1.5rem; }
-.section-eyebrow {
-  font-size: 0.65rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+/* ===================== SECTIONS ===================== */
+.sec { padding: 4rem 1.5rem; }
+.sec-dark  { background: var(--night); }
+.sec-deep  { background: var(--deep); }
+.ey {
+  font-size: .62rem; letter-spacing: .35em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: .7rem;
+  display: flex; align-items: center; gap: .5rem;
 }
-.section-eyebrow::before {
-  content: ''; width: 20px; height: 1px;
-  background: var(--gold); opacity: 0.5;
-}
-.section-title {
+.ey::before { content:''; width:18px; height:1px; background:var(--gold); opacity:.5; }
+.ey-center { justify-content: center; }
+.sec-title {
   font-family: var(--fd);
-  font-size: clamp(2rem, 7vw, 3.5rem);
-  font-weight: 300;
-  line-height: 1.1;
-  color: var(--star);
-  margin-bottom: 1.2rem;
+  font-size: clamp(1.9rem, 7vw, 3.2rem);
+  font-weight: 300; line-height: 1.1; color: var(--star); margin-bottom: 1rem;
 }
-.section-title em { font-style: italic; color: var(--gold); }
+.sec-title em { font-style: italic; color: var(--gold); }
+.t-center { text-align: center; }
 
-/* PRODUIT VEDETTE */
-.hero-product { max-width: 900px; margin: 0 auto; }
-.product-main-img {
-  width: 100%;
-  aspect-ratio: 1;
+/* ===================== PRODUIT VEDETTE ===================== */
+.prod-img {
+  width: 100%; aspect-ratio: 1;
   background: linear-gradient(135deg, var(--ink), var(--deep));
   border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5rem; position: relative; overflow: hidden;
   margin-bottom: 1.5rem;
-  position: relative;
-  overflow: hidden;
 }
-.product-glow {
-  position: absolute;
-  width: 150px; height: 150px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,169,110,0.18), transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
+.pglow {
+  position: absolute; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,169,110,.18), transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
   animation: pulse 3s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%,100% { transform: translate(-50%,-50%) scale(1); opacity:0.5; }
-  50% { transform: translate(-50%,-50%) scale(1.3); opacity:1; }
+  0%,100% { transform: translate(-50%,-50%) scale(1); opacity:.5; }
+  50%      { transform: translate(-50%,-50%) scale(1.3); opacity:1; }
 }
-.floating-review {
-  position: absolute;
-  bottom: 1rem; right: 1rem;
-  background: rgba(19,23,32,0.92);
-  border: 1px solid rgba(200,212,232,0.1);
-  padding: 0.7rem 1rem;
-  border-radius: 4px;
-  text-align: left;
+.float-rev {
+  position: absolute; bottom: .8rem; right: .8rem;
+  background: rgba(19,23,32,.93);
+  border: 1px solid rgba(200,212,232,.1);
+  padding: .6rem .9rem; border-radius: 4px; text-align: left;
 }
-.stars-row { color: var(--gold); font-size: 0.75rem; margin-bottom: 0.2rem; }
-.floating-text { font-size: 0.7rem; color: var(--moon); }
-.floating-author { font-size: 0.6rem; color: var(--mist); margin-top: 0.2rem; }
-.product-detail-price {
-  font-family: var(--fd);
-  font-size: 2.2rem;
-  color: var(--gold);
-  margin-bottom: 0.4rem;
+.float-stars { color: var(--gold); font-size: .72rem; margin-bottom: .15rem; }
+.float-txt   { font-size: .68rem; color: var(--moon); }
+.float-auth  { font-size: .58rem; color: var(--mist); margin-top: .15rem; }
+.big-price {
+  font-family: var(--fd); font-size: 2.2rem; color: var(--gold); margin-bottom: .3rem;
 }
-.product-detail-price span {
-  font-size: 1.1rem;
-  color: var(--mist);
-  text-decoration: line-through;
-  margin-left: 0.8rem;
+.big-price s { font-size: 1.1rem; color: var(--mist); margin-left: .6rem; }
+.savings {
+  display: inline-block; margin-bottom: 1.3rem;
+  background: rgba(201,169,110,.1); border: 1px solid rgba(201,169,110,.2);
+  color: var(--gold); font-size: .68rem; padding: .25rem .7rem; border-radius: 2px;
 }
-.product-savings {
-  display: inline-block;
-  background: rgba(201,169,110,0.1);
-  border: 1px solid rgba(201,169,110,0.2);
-  color: var(--gold);
-  font-size: 0.7rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 2px;
-  margin-bottom: 1.5rem;
+.feats { list-style: none; margin-bottom: 1.8rem; }
+.feats li {
+  display: flex; gap: .7rem; align-items: flex-start;
+  margin-bottom: .7rem; font-size: .87rem; color: var(--moon);
 }
-.product-features { list-style: none; margin-bottom: 2rem; }
-.product-features li {
-  display: flex;
-  gap: 0.8rem;
-  align-items: flex-start;
-  margin-bottom: 0.8rem;
-  font-size: 0.88rem;
-  color: var(--moon);
-}
-.feature-icon {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: rgba(201,169,110,0.1);
-  border: 1px solid rgba(201,169,110,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  flex-shrink: 0;
-  color: var(--gold);
-  margin-top: 3px;
-}
-.buy-section { display: flex; flex-direction: column; gap: 0.8rem; }
-.quantity-row { display: flex; gap: 0.8rem; align-items: center; }
-.qty-btn {
-  width: 36px; height: 36px;
-  background: var(--ink);
-  border: 1px solid rgba(200,212,232,0.15);
-  color: var(--star);
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-}
-.qty-btn:hover { border-color: var(--gold); color: var(--gold); }
-.qty-display {
-  font-family: var(--fd);
-  font-size: 1.2rem;
-  min-width: 2rem;
-  text-align: center;
-}
-.qty-hint { font-size: 0.75rem; color: var(--mist); }
-.guarantee {
-  font-size: 0.72rem;
-  color: var(--mist);
-  line-height: 1.6;
-}
-
-/* PRODUCTS GRID */
-.products-section { background: var(--deep); }
-.products-section-header { text-align: center; margin-bottom: 2.5rem; }
-.products-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-.product-card {
-  background: var(--ink);
-  overflow: hidden;
-  cursor: pointer;
-}
-.product-img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  position: relative;
-}
-.product-img-bg { position: absolute; inset: 0; }
-.product-badge {
-  position: absolute;
-  top: 0.6rem; left: 0.6rem;
-  background: var(--gold);
-  color: var(--night);
-  font-size: 0.55rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.5rem;
-  font-weight: 500;
-}
-.product-info { padding: 1rem; }
-.product-name {
-  font-family: var(--fd);
-  font-size: 1.1rem;
-  color: var(--star);
-  margin-bottom: 0.3rem;
-}
-.product-desc { font-size: 0.72rem; color: var(--mist); margin-bottom: 0.8rem; line-height: 1.5; }
-.product-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-.product-price { font-family: var(--fd); font-size: 1.2rem; color: var(--gold); }
-.product-price-old { font-size: 0.8rem; color: var(--mist); text-decoration: line-through; margin-left: 0.3rem; }
-.btn-add {
-  background: transparent;
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  padding: 0.4rem 0.8rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 1px;
-  font-family: var(--fb);
-  white-space: nowrap;
-}
-.btn-add:hover { background: var(--gold); color: var(--night); }
-
-/* BENEFITS */
-.benefit-item {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-.benefit-num {
-  font-family: var(--fd);
-  font-size: 2.5rem;
-  font-weight: 300;
-  color: rgba(201,169,110,0.18);
-  line-height: 1;
-  flex-shrink: 0;
-  min-width: 2.5rem;
-}
-.benefit-text h3 {
-  font-family: var(--fd);
-  font-size: 1.2rem;
-  color: var(--star);
-  margin-bottom: 0.4rem;
-}
-.benefit-text p { font-size: 0.85rem; color: var(--mist); line-height: 1.7; }
-
-/* TESTIMONIALS */
-.testimonials-section { background: var(--deep); }
-.testimonial-card {
-  background: var(--ink);
-  padding: 1.5rem;
-  border-radius: 4px;
-  border: 1px solid rgba(200,212,232,0.06);
-  margin-bottom: 1rem;
-}
-.testimonial-quote {
-  font-family: var(--fd);
-  font-size: 3rem;
-  color: var(--gold);
-  opacity: 0.3;
-  line-height: 1;
-  margin-bottom: 0.3rem;
-}
-.testimonial-text {
-  font-size: 0.88rem;
-  color: var(--moon);
-  line-height: 1.8;
-  margin-bottom: 1.2rem;
-  font-style: italic;
-}
-.testimonial-author { display: flex; align-items: center; gap: 0.8rem; }
-.author-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--aurora), var(--ink));
+.fi {
+  width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(201,169,110,.1); border: 1px solid rgba(201,169,110,.3);
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; flex-shrink: 0;
+  font-size: .62rem; color: var(--gold); margin-top: 3px;
 }
-.author-name { font-size: 0.82rem; color: var(--star); display: block; margin-bottom: 0.1rem; }
-.author-detail { font-size: 0.68rem; color: var(--mist); }
-.stars-gold { color: var(--gold); font-size: 0.7rem; }
-
-/* HOW IT WORKS */
-.steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 600px; margin: 0 auto; }
-.step-card { text-align: center; padding: 1.5rem 1rem; }
-.step-icon {
-  width: 55px; height: 55px;
-  border-radius: 50%;
-  background: var(--ink);
-  border: 1px solid rgba(201,169,110,0.3);
+.buy-box { display: flex; flex-direction: column; gap: .8rem; }
+.qty-row { display: flex; gap: .7rem; align-items: center; }
+.qb {
+  width: 36px; height: 36px; border-radius: 2px;
+  background: var(--ink); border: 1px solid rgba(200,212,232,.15);
+  color: var(--star); font-size: 1.2rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem;
-  margin: 0 auto 1rem;
-  position: relative;
 }
-.step-num {
-  position: absolute; top: -7px; right: -7px;
-  width: 18px; height: 18px;
-  background: var(--gold);
-  border-radius: 50%;
-  font-size: 0.6rem;
+.qb:active { border-color: var(--gold); color: var(--gold); }
+.qn { font-family: var(--fd); font-size: 1.2rem; min-width: 2rem; text-align: center; }
+.qhint { font-size: .73rem; color: var(--mist); }
+.guar { font-size: .7rem; color: var(--mist); line-height: 1.6; }
+
+/* ===================== GRILLE PRODUITS ===================== */
+.pgrid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px; max-width: 800px; margin: 0 auto;
+}
+.pcard { background: var(--ink); overflow: hidden; }
+.pcard-img {
+  width: 100%; aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.3rem; position: relative;
+}
+.pcard-bg { position: absolute; inset: 0; }
+.pbadge {
+  position: absolute; top: .5rem; left: .5rem;
+  background: var(--gold); color: var(--night);
+  font-size: .52rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .18rem .5rem; font-weight: 500;
+}
+.pinfo { padding: .9rem; }
+.pname { font-family: var(--fd); font-size: 1.05rem; color: var(--star); margin-bottom: .25rem; }
+.pdesc { font-size: .7rem; color: var(--mist); margin-bottom: .7rem; line-height: 1.5; }
+.pfoot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem; }
+.pprice { font-family: var(--fd); font-size: 1.15rem; color: var(--gold); }
+.pprice s { font-size: .78rem; color: var(--mist); margin-left: .25rem; }
+.badd {
+  background: transparent; border: 1px solid var(--gold);
+  color: var(--gold); padding: .35rem .7rem;
+  font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+  cursor: pointer; border-radius: 1px; font-family: var(--fb); white-space: nowrap;
+}
+.badd:active { background: var(--gold); color: var(--night); }
+
+/* ===================== BENEFICES ===================== */
+.bitem { display: flex; gap: 1rem; margin-bottom: 1.8rem; }
+.bnum {
+  font-family: var(--fd); font-size: 2.3rem; font-weight: 300;
+  color: rgba(201,169,110,.18); line-height: 1; flex-shrink: 0; min-width: 2.3rem;
+}
+.btext h3 { font-family: var(--fd); font-size: 1.15rem; color: var(--star); margin-bottom: .35rem; }
+.btext p  { font-size: .84rem; color: var(--mist); line-height: 1.7; }
+
+/* ===================== ETAPES ===================== */
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; max-width: 560px; margin: 0 auto; }
+.scard { text-align: center; padding: 1.3rem .8rem; }
+.sicon {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--ink); border: 1px solid rgba(201,169,110,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; margin: 0 auto .9rem; position: relative;
+}
+.snum {
+  position: absolute; top: -6px; right: -6px;
+  width: 17px; height: 17px; background: var(--gold);
+  border-radius: 50%; font-size: .58rem;
   display: flex; align-items: center; justify-content: center;
   color: var(--night); font-weight: 700;
 }
-.step-title { font-family: var(--fd); font-size: 1rem; color: var(--star); margin-bottom: 0.4rem; }
-.step-desc { font-size: 0.78rem; color: var(--mist); line-height: 1.6; }
+.stitle { font-family: var(--fd); font-size: .95rem; color: var(--star); margin-bottom: .3rem; }
+.sdesc  { font-size: .76rem; color: var(--mist); line-height: 1.6; }
 
-/* BUNDLE */
-.bundle-section {
-  background: var(--deep);
-  border-top: 1px solid rgba(201,169,110,0.12);
-  border-bottom: 1px solid rgba(201,169,110,0.12);
-  text-align: center;
+/* ===================== AVIS ===================== */
+.tcard {
+  background: var(--ink); padding: 1.4rem;
+  border-radius: 4px; border: 1px solid rgba(200,212,232,.06);
+  margin-bottom: .9rem;
 }
-.bundle-box {
-  max-width: 600px;
-  margin: 0 auto;
-  background: var(--night);
-  border: 1px solid rgba(201,169,110,0.2);
-  border-radius: 4px;
-  padding: 2rem 1.5rem;
-  position: relative;
-}
-.bundle-tag {
-  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-  background: var(--gold); color: var(--night);
-  font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
-  padding: 0.3rem 1.2rem; border-radius: 2px; font-weight: 500; white-space: nowrap;
-}
-.bundle-items { display: grid; grid-template-columns: repeat(2,1fr); gap: 0.8rem; margin: 1.5rem 0; }
-.bundle-item {
-  text-align: center; padding: 0.8rem;
-  background: var(--deep);
-  border-radius: 4px;
-  border: 1px solid rgba(200,212,232,0.06);
-}
-.bundle-item-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.4rem; }
-.bundle-item-name { font-size: 0.7rem; color: var(--moon); }
-.bundle-item-price { font-size: 0.65rem; color: var(--mist); text-decoration: line-through; }
-.bundle-total { font-family: var(--fd); font-size: 2.5rem; color: var(--gold); margin: 0.8rem 0 0.3rem; }
-.bundle-savings-badge {
-  display: inline-block;
-  background: rgba(201,169,110,0.1);
-  border: 1px solid rgba(201,169,110,0.3);
-  color: var(--gold); font-size: 0.72rem;
-  padding: 0.3rem 0.8rem; border-radius: 2px; margin-bottom: 1.5rem;
-}
-
-/* FAQ */
-.faq-container { max-width: 700px; margin: 0 auto; }
-.faq-item { border-bottom: 1px solid rgba(200,212,232,0.08); }
-.faq-question {
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1.2rem 0;
-  background: none; border: none;
-  color: var(--star); font-family: var(--fb);
-  font-size: 0.9rem; cursor: pointer; text-align: left; gap: 1rem;
-}
-.faq-question:hover { color: var(--gold); }
-.faq-icon {
-  width: 22px; height: 22px; border-radius: 50%;
-  border: 1px solid rgba(201,169,110,0.3);
+.tquote { font-family: var(--fd); font-size: 2.8rem; color: var(--gold); opacity: .3; line-height: 1; margin-bottom: .2rem; }
+.ttxt  { font-size: .86rem; color: var(--moon); line-height: 1.8; margin-bottom: 1rem; font-style: italic; }
+.tauth { display: flex; align-items: center; gap: .7rem; }
+.tavatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--aurora), var(--ink));
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.85rem; color: var(--gold); flex-shrink: 0;
-  transition: transform 0.3s;
+  font-size: .95rem; flex-shrink: 0;
 }
-.faq-item.open .faq-icon { transform: rotate(45deg); }
-.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.faq-item.open .faq-answer { max-height: 300px; }
-.faq-answer-inner { padding: 0 0 1.2rem; font-size: 0.85rem; color: var(--mist); line-height: 1.8; }
+.tname { font-size: .8rem; color: var(--star); display: block; margin-bottom: .08rem; }
+.tdetail { font-size: .66rem; color: var(--mist); }
+.tstars { color: var(--gold); font-size: .68rem; }
 
-/* ABOUT */
-.about-section { background: var(--deep); }
-.about-quote {
-  font-family: var(--fd);
-  font-size: clamp(1.3rem, 5vw, 1.9rem);
-  font-weight: 300; color: var(--star);
-  line-height: 1.4; font-style: italic;
-  margin-bottom: 1.5rem;
+/* ===================== BUNDLE ===================== */
+.bbox {
+  max-width: 560px; margin: 0 auto;
+  background: var(--night); border: 1px solid rgba(201,169,110,.2);
+  border-radius: 4px; padding: 2rem 1.3rem; position: relative;
 }
-.about-text { font-size: 0.88rem; color: var(--mist); line-height: 1.9; margin-bottom: 1.2rem; }
+.btag {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: var(--night);
+  font-size: .62rem; letter-spacing: .15em; text-transform: uppercase;
+  padding: .25rem 1rem; border-radius: 2px; font-weight: 500; white-space: nowrap;
+}
+.bitems { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin: 1.3rem 0; }
+.bitem2 {
+  text-align: center; padding: .7rem;
+  background: var(--deep); border-radius: 4px;
+  border: 1px solid rgba(200,212,232,.06);
+}
+.bemoji { font-size: 1.5rem; display: block; margin-bottom: .3rem; }
+.bname  { font-size: .68rem; color: var(--moon); }
+.bprice { font-size: .62rem; color: var(--mist); text-decoration: line-through; }
+.btotal { font-family: var(--fd); font-size: 2.3rem; color: var(--gold); margin: .7rem 0 .25rem; }
+.bsave {
+  display: inline-block; margin-bottom: 1.3rem;
+  background: rgba(201,169,110,.1); border: 1px solid rgba(201,169,110,.3);
+  color: var(--gold); font-size: .7rem; padding: .25rem .75rem; border-radius: 2px;
+}
 
-/* FOOTER */
+/* ===================== FAQ ===================== */
+.faq-wrap { max-width: 660px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid rgba(200,212,232,.08); }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 0; background: none; border: none;
+  color: var(--star); font-family: var(--fb); font-size: .88rem;
+  cursor: pointer; text-align: left; gap: 1rem;
+}
+.faq-q:active { color: var(--gold); }
+.faq-ico {
+  width: 21px; height: 21px; border-radius: 50%;
+  border: 1px solid rgba(201,169,110,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .82rem; color: var(--gold); flex-shrink: 0;
+  transition: transform .3s;
+}
+.faq-item.open .faq-ico { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+.faq-item.open .faq-a { max-height: 280px; }
+.faq-a-in { padding: 0 0 1.1rem; font-size: .83rem; color: var(--mist); line-height: 1.8; }
+
+/* ===================== ABOUT ===================== */
+.aquote {
+  font-family: var(--fd); font-size: clamp(1.25rem, 5vw, 1.8rem);
+  font-weight: 300; color: var(--star); line-height: 1.4;
+  font-style: italic; margin-bottom: 1.3rem;
+}
+.atxt { font-size: .87rem; color: var(--mist); line-height: 1.9; margin-bottom: 1rem; }
+
+/* ===================== FOOTER ===================== */
 footer {
   background: var(--night);
-  border-top: 1px solid rgba(200,212,232,0.06);
-  padding: 3rem 1.5rem 7rem;
+  border-top: 1px solid rgba(200,212,232,.06);
+  padding: 2.5rem 1.5rem;
 }
-.footer-logo {
-  font-family: var(--fd); font-size: 1.8rem; font-weight: 300;
-  letter-spacing: 0.3em; color: var(--gold);
+.flogo {
+  font-family: var(--fd); font-size: 1.7rem; font-weight: 300;
+  letter-spacing: .3em; color: var(--gold);
   text-decoration: none; text-transform: uppercase;
-  display: block; margin-bottom: 0.8rem;
+  display: block; margin-bottom: .7rem;
 }
-.footer-tagline { font-size: 0.8rem; color: var(--mist); line-height: 1.7; margin-bottom: 1.2rem; }
-.footer-socials { display: flex; gap: 0.6rem; margin-bottom: 2rem; }
-.social-btn {
-  width: 34px; height: 34px;
-  border: 1px solid rgba(200,212,232,0.12);
-  border-radius: 2px;
+.ftagline { font-size: .78rem; color: var(--mist); line-height: 1.7; margin-bottom: 1.1rem; }
+.fsocials { display: flex; gap: .5rem; margin-bottom: 1.8rem; }
+.fsoc {
+  width: 32px; height: 32px; border-radius: 2px;
+  border: 1px solid rgba(200,212,232,.12);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.85rem; color: var(--mist); text-decoration: none;
+  font-size: .82rem; color: var(--mist); text-decoration: none;
 }
-.footer-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-.footer-col h4 {
-  font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--star); margin-bottom: 1rem;
-}
-.footer-col ul { list-style: none; }
-.footer-col li { margin-bottom: 0.6rem; }
-.footer-col a { font-size: 0.8rem; color: var(--mist); text-decoration: none; }
-.footer-col a:hover { color: var(--gold); }
-.footer-bottom { font-size: 0.72rem; color: var(--mist); }
-.footer-trust { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.8rem; }
-.trust-badge { font-size: 0.68rem; color: var(--mist); }
+.fcols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.8rem; }
+.fcol h4 { font-size: .62rem; letter-spacing: .25em; text-transform: uppercase; color: var(--star); margin-bottom: .9rem; }
+.fcol ul { list-style: none; }
+.fcol li { margin-bottom: .55rem; }
+.fcol a { font-size: .78rem; color: var(--mist); text-decoration: none; }
+.fbot { font-size: .7rem; color: var(--mist); }
+.ftrust { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: .7rem; }
+.ftrust span { font-size: .66rem; color: var(--mist); }
 
-/* STICKY CTA MOBILE */
-.sticky-cta {
+/* ===================== STICKY CTA ===================== */
+.sticky {
   position: fixed;
   bottom: 0; left: 0; right: 0;
+  height: var(--cta-h);
+  /* hauteur + safe area iPhone (encoche/home bar) */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--deep);
-  border-top: 1px solid rgba(201,169,110,0.2);
-  padding: 0.75rem 1.2rem;
-  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 70px;
-  -webkit-transform: translate3d(0,0,0);
-  transform: translate3d(0,0,0);
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  border-top: 1px solid rgba(201,169,110,.22);
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 1.2rem; padding-right: 1.2rem; gap: 1rem;
+  z-index: 99;
+  /* fix iOS position:fixed */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
-.sticky-price { font-family: var(--fd); font-size: 1.4rem; color: var(--gold); line-height: 1.1; }
-.sticky-sub { font-size: 0.65rem; color: var(--mist); }
+.sticky-l {}
+.sticky-price { font-family: var(--fd); font-size: 1.4rem; color: var(--gold); line-height: 1; }
+.sticky-sub   { font-size: .63rem; color: var(--mist); margin-top: .1rem; }
 .sticky-btn {
   background: var(--gold); color: var(--night);
   border: none; border-radius: 2px;
-  padding: 0.8rem 1.4rem;
-  font-family: var(--fb); font-size: 0.78rem;
-  font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: .8rem 1.5rem;
+  font-family: var(--fb); font-size: .78rem;
+  font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
   cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }
+.sticky-btn:active { background: var(--gold2); }
 
-/* CART NOTIF */
-#cartNotif {
-  position: fixed; bottom: 90px; right: 1rem;
-  background: var(--ink); border: 1px solid rgba(201,169,110,0.4);
-  color: var(--star); padding: 0.8rem 1.2rem;
-  border-radius: 4px; font-size: 0.82rem; z-index: 9997;
-  transform: translateY(120px); opacity: 0;
-  transition: all 0.4s ease; max-width: 260px;
-  -webkit-transform: translateY(120px);
+/* ===================== CART NOTIF ===================== */
+#cnotif {
+  position: fixed;
+  /* au-dessus de la sticky CTA */
+  bottom: calc(var(--cta-h) + env(safe-area-inset-bottom, 0px) + 8px);
+  right: 1rem;
+  background: var(--ink); border: 1px solid rgba(201,169,110,.4);
+  color: var(--star); padding: .75rem 1.1rem;
+  border-radius: 4px; font-size: .8rem; z-index: 98;
+  opacity: 0; pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .35s, transform .35s;
+  max-width: 250px;
 }
-#cartNotif.show {
-  transform: translateY(0); opacity: 1;
-  -webkit-transform: translateY(0);
-}
+#cnotif.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
-/* REVEAL ANIM */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* ===================== REVEAL ===================== */
+.rv { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+.rv.on { opacity: 1; transform: translateY(0); }
+@keyframes fu { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(25px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav id="navbar">
-  <a href="#" class="nav-logo">Lumès</a>
-  <button class="hamburger" id="hamburger" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+<nav>
+  <a href="#" class="logo">Lumès</a>
+  <button class="burger" id="bburger"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="menu-close" id="menuClose">✕</button>
-  <a href="#produits" onclick="closeMenu()">Collection</a>
-  <a href="#bienfaits" onclick="closeMenu()">Bienfaits</a>
-  <a href="#avis" onclick="closeMenu()">Avis</a>
-  <a href="#faq" onclick="closeMenu()">FAQ</a>
-  <a href="#produits" onclick="closeMenu()" style="color:var(--gold);border:1px solid var(--gold);padding:0.6rem 1.5rem;border-radius:2px;">Commander</a>
+<!-- MENU MOBILE -->
+<div class="mmenu" id="mmenu">
+  <button class="mmenu-close" id="mclose">✕</button>
+  <a href="#produits" onclick="cm()">Collection</a>
+  <a href="#bienfaits" onclick="cm()">Bienfaits</a>
+  <a href="#avis" onclick="cm()">Avis</a>
+  <a href="#faq" onclick="cm()">FAQ</a>
+  <a href="#produits" onclick="cm()" style="color:var(--gold);border:1px solid var(--gold);padding:.6rem 1.4rem;border-radius:2px;">Commander</a>
 </div>
 
 <!-- HERO -->
-<section class="hero" id="home">
+<section class="hero sec-dark">
   <div class="hero-bg"></div>
   <div class="stars" id="stars"></div>
-  <div class="hero-inner">
-    <p class="hero-eyebrow" style="animation:fadeUp 0.8s ease both 0.2s">Sleep Technology · Bien-être · 2026</p>
-    <h1 class="hero-title" style="animation:fadeUp 0.8s ease both 0.4s">
-      Révèle ton<br><em>sommeil idéal</em>
-    </h1>
-    <p class="hero-sub" style="animation:fadeUp 0.8s ease both 0.6s">
-      Des accessoires de sommeil premium conçus pour transformer vos nuits — moins de stress, plus de récupération.
-    </p>
-    <div class="hero-btns" style="animation:fadeUp 0.8s ease both 0.8s">
-      <a href="#produits" class="btn-primary">Découvrir</a>
-      <a href="#bienfaits" class="btn-ghost">En savoir plus</a>
+  <div class="hero-in">
+    <p class="eyebrow" style="animation:fu .8s ease both .2s">Sleep Technology · Bien-être · 2026</p>
+    <h1 class="hero-title" style="animation:fu .8s ease both .35s">Révèle ton<br><em>sommeil idéal</em></h1>
+    <p class="hero-sub" style="animation:fu .8s ease both .5s">Des accessoires de sommeil premium pour transformer vos nuits — moins de stress, plus de récupération.</p>
+    <div class="hero-btns" style="animation:fu .8s ease both .65s">
+      <a href="#produits" class="btn btn-gold">Découvrir</a>
+      <a href="#bienfaits" class="btn btn-ghost">En savoir plus</a>
     </div>
-    <div class="hero-trust" style="animation:fadeUp 0.8s ease both 1s">
-      <div class="trust-item">⭐ 4.9/5 — 2 300+ avis</div>
-      <div class="trust-item">🚚 Livraison 5–8j en France</div>
-      <div class="trust-item">🔄 Retours 30 jours offerts</div>
+    <div class="trust-list" style="animation:fu .8s ease both .8s">
+      <span>⭐ 4.9/5 — 2 300+ avis vérifiés</span>
+      <span>🚚 Livraison 5–8j en France</span>
+      <span>🔄 Retours 30 jours offerts</span>
     </div>
   </div>
 </section>
 
 <!-- PROOF BAR -->
 <div class="proof-bar">
-  <div class="proof-stat">
-    <span class="proof-number">2 300+</span>
-    <span class="proof-label">Clients satisfaits</span>
-  </div>
-  <div class="proof-stat">
-    <span class="proof-number">4.9★</span>
-    <span class="proof-label">Note moyenne</span>
-  </div>
-  <div class="proof-stat">
-    <span class="proof-number">87%</span>
-    <span class="proof-label">Dorment mieux dès J1</span>
-  </div>
-  <div class="proof-stat">
-    <span class="proof-number">30j</span>
-    <span class="proof-label">Garantie satisfait</span>
-  </div>
+  <div class="proof-stat"><span class="proof-n">2 300+</span><span class="proof-l">Clients satisfaits</span></div>
+  <div class="proof-stat"><span class="proof-n">4.9★</span><span class="proof-l">Note moyenne</span></div>
+  <div class="proof-stat"><span class="proof-n">87%</span><span class="proof-l">Dorment mieux dès J1</span></div>
+  <div class="proof-stat"><span class="proof-n">30j</span><span class="proof-l">Garantie satisfait</span></div>
 </div>
 
 <!-- PRODUIT VEDETTE -->
-<section style="background:var(--night);" id="produit-vedette">
-  <div class="hero-product">
-    <div class="product-visual reveal">
-      <div class="product-main-img">
-        <div class="product-glow"></div>
-        <span style="position:relative;z-index:1;">😴</span>
-        <div class="floating-review">
-          <div class="stars-row">★★★★★</div>
-          <div class="floating-text">"Enfin je dors toute la nuit"</div>
-          <div class="floating-author">— Marie L., Lyon · Vérifié</div>
-        </div>
+<section class="sec sec-dark" id="produit-vedette">
+  <div class="rv">
+    <div class="prod-img">
+      <div class="pglow"></div>
+      <span style="position:relative;z-index:1">😴</span>
+      <div class="float-rev">
+        <div class="float-stars">★★★★★</div>
+        <div class="float-txt">"Enfin je dors toute la nuit"</div>
+        <div class="float-auth">— Marie L., Lyon · Vérifié</div>
       </div>
     </div>
-    <div class="reveal" style="margin-top:1.5rem;">
-      <div class="section-eyebrow">Produit vedette</div>
-      <h2 class="section-title">Masque Sommeil<br><em>Gravity Pro™</em></h2>
-      <div class="product-detail-price">49,90€ <span>79,90€</span></div>
-      <div class="product-savings">— Économisez 37% · Offre limitée</div>
-      <ul class="product-features">
-        <li><div class="feature-icon">✓</div><div>Acupression — endormissement en moins de 10 min</div></li>
-        <li><div class="feature-icon">✓</div><div>Mousse mémoire de forme thermorégulante</div></li>
-        <li><div class="feature-icon">✓</div><div>Tissu bambou certifié OEKO-TEX® — hypoallergénique</div></li>
-        <li><div class="feature-icon">✓</div><div>Blocage lumineux 100%</div></li>
-        <li><div class="feature-icon">✓</div><div>Livraison offerte · Retours 30j gratuits</div></li>
-      </ul>
-      <div class="buy-section">
-        <div class="quantity-row">
-          <button class="qty-btn" onclick="changeQty(-1)">−</button>
-          <span class="qty-display" id="qty">1</span>
-          <button class="qty-btn" onclick="changeQty(1)">+</button>
-          <span class="qty-hint">2 achetés = −10%</span>
-        </div>
-        <button class="btn-primary" id="cartBtn" style="width:100%;padding:1rem;text-align:center;" onclick="addToCart()">
-          🛒 Ajouter au panier — 49,90€
-        </button>
-        <button class="btn-ghost" style="width:100%;padding:1rem;text-align:center;" onclick="buyNow()">
-          ⚡ Acheter maintenant
-        </button>
-        <div class="guarantee">🔒 SSL · 🛡️ 30j garantie · 📦 Livraison 5–8j</div>
+  </div>
+  <div class="rv">
+    <div class="ey">Produit vedette</div>
+    <h2 class="sec-title">Masque Sommeil<br><em>Gravity Pro™</em></h2>
+    <div class="big-price">49,90€ <s>79,90€</s></div>
+    <div class="savings">— Économisez 37% · Offre limitée</div>
+    <ul class="feats">
+      <li><div class="fi">✓</div><div>Acupression — endormissement en moins de 10 min</div></li>
+      <li><div class="fi">✓</div><div>Mousse mémoire de forme thermorégulante</div></li>
+      <li><div class="fi">✓</div><div>Tissu bambou certifié OEKO-TEX® — hypoallergénique</div></li>
+      <li><div class="fi">✓</div><div>Blocage lumineux 100%</div></li>
+      <li><div class="fi">✓</div><div>Livraison offerte · Retours 30j gratuits</div></li>
+    </ul>
+    <div class="buy-box">
+      <div class="qty-row">
+        <button class="qb" onclick="cq(-1)">−</button>
+        <span class="qn" id="qty">1</span>
+        <button class="qb" onclick="cq(1)">+</button>
+        <span class="qhint">2 achetés = −10%</span>
       </div>
+      <button class="btn btn-gold btn-full" id="cbtn" onclick="addCart()">🛒 Ajouter au panier — 49,90€</button>
+      <button class="btn btn-ghost btn-full" onclick="buyNow()">⚡ Acheter maintenant</button>
+      <div class="guar">🔒 SSL · 🛡️ 30j garantie · 📦 Livraison 5–8j</div>
     </div>
   </div>
 </section>
 
 <!-- COLLECTION -->
-<section class="products-section" id="produits">
-  <div class="products-section-header reveal">
-    <div class="section-eyebrow" style="justify-content:center;">Notre collection</div>
-    <h2 class="section-title">Chaque produit,<br><em>une transformation</em></h2>
+<section class="sec sec-deep" id="produits">
+  <div class="t-center rv" style="margin-bottom:2rem">
+    <div class="ey ey-center">Notre collection</div>
+    <h2 class="sec-title">Chaque produit,<br><em>une transformation</em></h2>
   </div>
-  <div class="products-grid">
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1C2130,#0C0F14)"></div><div class="product-badge">Best-seller</div><span style="position:relative;z-index:1">😴</span></div>
-      <div class="product-info">
-        <div class="product-name">Gravity Pro™</div>
-        <div class="product-desc">Masque lestée acupression. Endormissement garanti.</div>
-        <div class="product-footer"><div><span class="product-price">49,90€</span><span class="product-price-old">79,90€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1A1F2E,#131720)"></div><div class="product-badge">Nouveau</div><span style="position:relative;z-index:1">🌙</span></div>
-      <div class="product-info">
-        <div class="product-name">Drift Pillow™</div>
-        <div class="product-desc">Oreiller latex naturel — alignement cervical parfait.</div>
-        <div class="product-footer"><div><span class="product-price">69,90€</span><span class="product-price-old">110€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1C2130,#152030)"></div><div class="product-badge">Viral TikTok</div><span style="position:relative;z-index:1">🧘</span></div>
-      <div class="product-info">
-        <div class="product-name">NightRoll™</div>
-        <div class="product-desc">Rouleau cervical chauffant. Décompression en 5 min.</div>
-        <div class="product-footer"><div><span class="product-price">39,90€</span><span class="product-price-old">59,90€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1A1830,#0C0F14)"></div><span style="position:relative;z-index:1">🔊</span></div>
-      <div class="product-info">
-        <div class="product-name">SoundVeil™</div>
-        <div class="product-desc">Masque bluetooth — méditations et bruits blancs.</div>
-        <div class="product-footer"><div><span class="product-price">64,90€</span><span class="product-price-old">99€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1C2418,#0C0F14)"></div><span style="position:relative;z-index:1">🌡️</span></div>
-      <div class="product-info">
-        <div class="product-name">CoolPad™</div>
-        <div class="product-desc">Coussin réfrigérant réutilisable. Effet immédiat.</div>
-        <div class="product-footer"><div><span class="product-price">29,90€</span><span class="product-price-old">44,90€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
-    <div class="product-card reveal">
-      <div class="product-img"><div class="product-img-bg" style="background:linear-gradient(135deg,#1C1820,#0C0F14)"></div><div class="product-badge">Pack</div><span style="position:relative;z-index:1">✨</span></div>
-      <div class="product-info">
-        <div class="product-name">Sleep Kit™</div>
-        <div class="product-desc">Coffret complet : masque + bouchons + spray relaxant.</div>
-        <div class="product-footer"><div><span class="product-price">89,90€</span><span class="product-price-old">149,70€</span></div><button class="btn-add">Ajouter</button></div>
-      </div>
-    </div>
+  <div class="pgrid">
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1C2130,#0C0F14)"></div><div class="pbadge">Best-seller</div><span style="position:relative;z-index:1">😴</span></div><div class="pinfo"><div class="pname">Gravity Pro™</div><div class="pdesc">Masque lestée acupression.</div><div class="pfoot"><div class="pprice">49,90€ <s>79,90€</s></div><button class="badd">Ajouter</button></div></div></div>
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1A1F2E,#131720)"></div><div class="pbadge">Nouveau</div><span style="position:relative;z-index:1">🌙</span></div><div class="pinfo"><div class="pname">Drift Pillow™</div><div class="pdesc">Oreiller latex naturel.</div><div class="pfoot"><div class="pprice">69,90€ <s>110€</s></div><button class="badd">Ajouter</button></div></div></div>
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1C2130,#152030)"></div><div class="pbadge">Viral</div><span style="position:relative;z-index:1">🧘</span></div><div class="pinfo"><div class="pname">NightRoll™</div><div class="pdesc">Rouleau cervical chauffant.</div><div class="pfoot"><div class="pprice">39,90€ <s>59,90€</s></div><button class="badd">Ajouter</button></div></div></div>
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1A1830,#0C0F14)"></div><span style="position:relative;z-index:1">🔊</span></div><div class="pinfo"><div class="pname">SoundVeil™</div><div class="pdesc">Masque bluetooth intégré.</div><div class="pfoot"><div class="pprice">64,90€ <s>99€</s></div><button class="badd">Ajouter</button></div></div></div>
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1C2418,#0C0F14)"></div><span style="position:relative;z-index:1">🌡️</span></div><div class="pinfo"><div class="pname">CoolPad™</div><div class="pdesc">Coussin réfrigérant.</div><div class="pfoot"><div class="pprice">29,90€ <s>44,90€</s></div><button class="badd">Ajouter</button></div></div></div>
+    <div class="pcard rv"><div class="pcard-img"><div class="pcard-bg" style="background:linear-gradient(135deg,#1C1820,#0C0F14)"></div><div class="pbadge">Pack</div><span style="position:relative;z-index:1">✨</span></div><div class="pinfo"><div class="pname">Sleep Kit™</div><div class="pdesc">Coffret complet 3-en-1.</div><div class="pfoot"><div class="pprice">89,90€ <s>149€</s></div><button class="badd">Ajouter</button></div></div></div>
   </div>
 </section>
 
 <!-- BIENFAITS -->
-<section style="background:var(--night);" id="bienfaits">
-  <div class="section-eyebrow reveal">Pourquoi Lumès</div>
-  <h2 class="section-title reveal">La science du<br><em>sommeil profond</em></h2>
-  <p class="reveal" style="color:var(--mist);font-size:0.88rem;margin-bottom:2.5rem;line-height:1.8;">Collaboré avec des spécialistes du sommeil pour créer des produits qui agissent réellement.</p>
-  <div class="benefit-item reveal">
-    <div class="benefit-num">01</div>
-    <div class="benefit-text">
-      <h3>Endormissement en 10 min</h3>
-      <p>La pression douce stimule le système parasympathique, réduisant l'anxiété et accélérant l'endormissement.</p>
-    </div>
-  </div>
-  <div class="benefit-item reveal">
-    <div class="benefit-num">02</div>
-    <div class="benefit-text">
-      <h3>Réveil sans douleurs</h3>
-      <p>L'alignement cervical optimal prévient les tensions nocturnes — votre corps se réveille léger.</p>
-    </div>
-  </div>
-  <div class="benefit-item reveal">
-    <div class="benefit-num">03</div>
-    <div class="benefit-text">
-      <h3>Énergie multipliée</h3>
-      <p>Une nuit de sommeil profond = jusqu'à 40% de productivité en plus. Constaté dès la 1ère semaine.</p>
-    </div>
-  </div>
+<section class="sec sec-dark" id="bienfaits">
+  <div class="ey rv">Pourquoi Lumès</div>
+  <h2 class="sec-title rv">La science du<br><em>sommeil profond</em></h2>
+  <p class="rv" style="color:var(--mist);font-size:.87rem;margin-bottom:2.2rem;line-height:1.8">Collaboré avec des spécialistes pour créer des produits qui agissent vraiment.</p>
+  <div class="bitem rv"><div class="bnum">01</div><div class="btext"><h3>Endormissement en 10 min</h3><p>La pression douce stimule le système parasympathique et réduit l'anxiété au coucher.</p></div></div>
+  <div class="bitem rv"><div class="bnum">02</div><div class="btext"><h3>Réveil sans douleurs</h3><p>L'alignement cervical optimal prévient les tensions nocturnes — corps léger le matin.</p></div></div>
+  <div class="bitem rv"><div class="bnum">03</div><div class="btext"><h3>Énergie multipliée</h3><p>Sommeil profond = jusqu'à 40% de productivité en plus. Dès la 1ère semaine.</p></div></div>
 </section>
 
 <!-- ETAPES -->
-<section style="background:var(--deep);" id="methode">
-  <div style="text-align:center;margin-bottom:2.5rem;" class="reveal">
-    <div class="section-eyebrow" style="justify-content:center;">Méthode Lumès</div>
-    <h2 class="section-title">En <em>4 étapes</em></h2>
+<section class="sec sec-deep" id="methode">
+  <div class="t-center rv" style="margin-bottom:2rem">
+    <div class="ey ey-center">Méthode Lumès</div>
+    <h2 class="sec-title">En <em>4 étapes</em></h2>
   </div>
-  <div class="steps-grid">
-    <div class="step-card reveal"><div class="step-icon">🛍️<div class="step-num">1</div></div><div class="step-title">Commandez</div><p class="step-desc">Livraison 5–8j, emballage premium.</p></div>
-    <div class="step-card reveal"><div class="step-icon">📦<div class="step-num">2</div></div><div class="step-title">Installez</div><p class="step-desc">Guide inclus. 3 minutes pour optimiser.</p></div>
-    <div class="step-card reveal"><div class="step-icon">😴<div class="step-num">3</div></div><div class="step-title">Dormez</div><p class="step-desc">87% dorment mieux dès la 1ère nuit.</p></div>
-    <div class="step-card reveal"><div class="step-icon">⚡<div class="step-num">4</div></div><div class="step-title">Vibrez</div><p class="step-desc">Réveil naturel, énergie retrouvée.</p></div>
+  <div class="sgrid">
+    <div class="scard rv"><div class="sicon">🛍️<div class="snum">1</div></div><div class="stitle">Commandez</div><p class="sdesc">Livraison 5–8j, emballage premium.</p></div>
+    <div class="scard rv"><div class="sicon">📦<div class="snum">2</div></div><div class="stitle">Installez</div><p class="sdesc">3 minutes pour tout configurer.</p></div>
+    <div class="scard rv"><div class="sicon">😴<div class="snum">3</div></div><div class="stitle">Dormez</div><p class="sdesc">87% dorment mieux dès J1.</p></div>
+    <div class="scard rv"><div class="sicon">⚡<div class="snum">4</div></div><div class="stitle">Vibrez</div><p class="sdesc">Réveil naturel, énergie retrouvée.</p></div>
   </div>
 </section>
 
 <!-- AVIS -->
-<section class="testimonials-section" id="avis">
-  <div style="text-align:center;margin-bottom:2rem;" class="reveal">
-    <div class="section-eyebrow" style="justify-content:center;">Témoignages</div>
-    <h2 class="section-title">Ils ont retrouvé<br><em>le sommeil</em></h2>
+<section class="sec sec-deep" id="avis">
+  <div class="t-center rv" style="margin-bottom:1.8rem">
+    <div class="ey ey-center">Témoignages</div>
+    <h2 class="sec-title">Ils ont retrouvé<br><em>le sommeil</em></h2>
   </div>
-  <div class="testimonial-card reveal">
-    <div class="testimonial-quote">"</div>
-    <p class="testimonial-text">5 ans de galère. Le masque Gravity Pro est la seule chose qui m'a vraiment aidée à m'endormir sans médicament. Je ne peux plus m'en passer.</p>
-    <div class="testimonial-author"><div class="author-avatar">👩</div><div><span class="author-name">Camille R.</span><span class="author-detail stars-gold">★★★★★</span><span class="author-detail"> · Strasbourg</span></div></div>
-  </div>
-  <div class="testimonial-card reveal">
-    <div class="testimonial-quote">"</div>
-    <p class="testimonial-text">Médecin aux urgences avec horaires décalés. Le SoundVeil avec mes bruits blancs a littéralement sauvé mes nuits.</p>
-    <div class="testimonial-author"><div class="author-avatar">👨‍⚕️</div><div><span class="author-name">Dr. Antoine M.</span><span class="author-detail stars-gold">★★★★★</span><span class="author-detail"> · Paris</span></div></div>
-  </div>
-  <div class="testimonial-card reveal">
-    <div class="testimonial-quote">"</div>
-    <p class="testimonial-text">Offert à ma mère. Elle m'a appelée le lendemain : 8h de sommeil d'affilée pour la 1ère fois depuis des années.</p>
-    <div class="testimonial-author"><div class="author-avatar">👩‍💼</div><div><span class="author-name">Sofia K.</span><span class="author-detail stars-gold">★★★★★</span><span class="author-detail"> · Bordeaux</span></div></div>
-  </div>
+  <div class="tcard rv"><div class="tquote">"</div><p class="ttxt">5 ans de galère. Le masque Gravity Pro est la seule chose qui m'a aidée à dormir sans médicament. Je ne peux plus m'en passer.</p><div class="tauth"><div class="tavatar">👩</div><div><span class="tname">Camille R.</span><span class="tdetail tstars">★★★★★</span><span class="tdetail"> · Strasbourg</span></div></div></div>
+  <div class="tcard rv"><div class="tquote">"</div><p class="ttxt">Médecin aux urgences. Le SoundVeil avec mes bruits blancs a sauvé mes nuits avec des horaires décalés.</p><div class="tauth"><div class="tavatar">👨‍⚕️</div><div><span class="tname">Dr. Antoine M.</span><span class="tdetail tstars">★★★★★</span><span class="tdetail"> · Paris</span></div></div></div>
+  <div class="tcard rv"><div class="tquote">"</div><p class="ttxt">Offert à ma mère : 8h de sommeil d'affilée pour la 1ère fois depuis des années. Elle m'a appelée en pleurant de joie.</p><div class="tauth"><div class="tavatar">👩‍💼</div><div><span class="tname">Sofia K.</span><span class="tdetail tstars">★★★★★</span><span class="tdetail"> · Bordeaux</span></div></div></div>
 </section>
 
 <!-- BUNDLE -->
-<section class="bundle-section">
-  <div style="text-align:center;margin-bottom:2.5rem;" class="reveal">
-    <div class="section-eyebrow" style="justify-content:center;">Offre exclusive</div>
-    <h2 class="section-title">Le <em>Sleep Kit™</em></h2>
+<section class="sec sec-dark t-center">
+  <div class="t-center rv" style="margin-bottom:2rem">
+    <div class="ey ey-center">Offre exclusive</div>
+    <h2 class="sec-title">Le <em>Sleep Kit™</em></h2>
   </div>
-  <div class="bundle-box reveal">
-    <div class="bundle-tag">✨ Économisez 60€ — Offre limitée</div>
-    <div class="bundle-items">
-      <div class="bundle-item"><span class="bundle-item-emoji">😴</span><div class="bundle-item-name">Gravity Pro™</div><div class="bundle-item-price">49,90€</div></div>
-      <div class="bundle-item"><span class="bundle-item-emoji">🔇</span><div class="bundle-item-name">SilentPro™</div><div class="bundle-item-price">29,90€</div></div>
-      <div class="bundle-item"><span class="bundle-item-emoji">🌿</span><div class="bundle-item-name">Spray Nuit™</div><div class="bundle-item-price">24,90€</div></div>
-      <div class="bundle-item"><span class="bundle-item-emoji">🎁</span><div class="bundle-item-name">Coffret</div><div class="bundle-item-price">Offert</div></div>
+  <div class="bbox rv">
+    <div class="btag">✨ Économisez 60€ — Offre limitée</div>
+    <div class="bitems">
+      <div class="bitem2"><span class="bemoji">😴</span><div class="bname">Gravity Pro™</div><div class="bprice">49,90€</div></div>
+      <div class="bitem2"><span class="bemoji">🔇</span><div class="bname">SilentPro™</div><div class="bprice">29,90€</div></div>
+      <div class="bitem2"><span class="bemoji">🌿</span><div class="bname">Spray Nuit™</div><div class="bprice">24,90€</div></div>
+      <div class="bitem2"><span class="bemoji">🎁</span><div class="bname">Coffret</div><div class="bprice">Offert</div></div>
     </div>
-    <div class="bundle-total">89,90€</div>
-    <div class="bundle-savings-badge">au lieu de 149,70€ — 40% d'économie</div><br>
-    <button class="btn-primary" style="padding:1rem 2rem;" onclick="buyNow()">🛒 Commander le Sleep Kit™</button>
-    <p style="font-size:0.72rem;color:var(--mist);margin-top:0.8rem;">🔒 Paiement sécurisé · 📦 5–8j · 🔄 30j remboursé</p>
+    <div class="btotal">89,90€</div>
+    <div class="bsave">au lieu de 149,70€ — 40% d'économie</div><br>
+    <button class="btn btn-gold" style="padding:.95rem 2rem" onclick="buyNow()">🛒 Commander le Sleep Kit™</button>
+    <p style="font-size:.7rem;color:var(--mist);margin-top:.75rem">🔒 Sécurisé · 📦 5–8j · 🔄 30j remboursé</p>
   </div>
 </section>
 
 <!-- FAQ -->
-<section style="background:var(--night);" id="faq">
-  <div class="reveal" style="margin-bottom:2rem;">
-    <div class="section-eyebrow">Questions fréquentes</div>
-    <h2 class="section-title">Vous avez des<br><em>questions ?</em></h2>
+<section class="sec sec-dark" id="faq">
+  <div class="rv" style="margin-bottom:1.8rem">
+    <div class="ey">Questions fréquentes</div>
+    <h2 class="sec-title">Vous avez des<br><em>questions ?</em></h2>
   </div>
-  <div class="faq-container">
-    <div class="faq-item reveal"><button class="faq-question" onclick="toggleFaq(this)">Les produits conviennent-ils à tous ?<div class="faq-icon">+</div></button><div class="faq-answer"><div class="faq-answer-inner">Oui, conçus pour tous les profils — insomnie légère, stress, douleurs cervicales ou optimisation du sommeil. En cas de pathologie grave, consultez un spécialiste en parallèle.</div></div></div>
-    <div class="faq-item reveal"><button class="faq-question" onclick="toggleFaq(this)">Quand verrai-je des résultats ?<div class="faq-icon">+</div></button><div class="faq-answer"><div class="faq-answer-inner">87% de nos clients rapportent une amélioration dès la première nuit. En 2 semaines, la majorité constate une transformation profonde de leur qualité de sommeil.</div></div></div>
-    <div class="faq-item reveal"><button class="faq-question" onclick="toggleFaq(this)">Comment fonctionne la garantie 30 jours ?<div class="faq-icon">+</div></button><div class="faq-answer"><div class="faq-answer-inner">Si vous n'êtes pas satisfait, contactez-nous. Nous organisons le retour à nos frais et remboursons sous 48h. Pas de questions compliquées.</div></div></div>
-    <div class="faq-item reveal"><button class="faq-question" onclick="toggleFaq(this)">Délais de livraison ?<div class="faq-icon">+</div></button><div class="faq-answer"><div class="faq-answer-inner">France métropolitaine : 5–8 jours ouvrés avec suivi. Belgique/Suisse/Luxembourg : 7–10 jours.</div></div></div>
-    <div class="faq-item reveal"><button class="faq-question" onclick="toggleFaq(this)">Matériaux certifiés ?<div class="faq-icon">+</div></button><div class="faq-answer"><div class="faq-answer-inner">Oui. Textiles certifiés OEKO-TEX® Standard 100, sans substances nocives. Produits conformes aux normes CE européennes.</div></div></div>
+  <div class="faq-wrap">
+    <div class="faq-item rv"><button class="faq-q" onclick="tfaq(this)">Les produits conviennent-ils à tous ?<div class="faq-ico">+</div></button><div class="faq-a"><div class="faq-a-in">Oui — insomnie légère, stress, douleurs cervicales ou simple optimisation du sommeil. En cas de pathologie grave, consultez un spécialiste en parallèle.</div></div></div>
+    <div class="faq-item rv"><button class="faq-q" onclick="tfaq(this)">Quand verrai-je des résultats ?<div class="faq-ico">+</div></button><div class="faq-a"><div class="faq-a-in">87% rapportent une amélioration dès la 1ère nuit. En 2 semaines, la majorité constate une transformation profonde.</div></div></div>
+    <div class="faq-item rv"><button class="faq-q" onclick="tfaq(this)">Comment fonctionne la garantie ?<div class="faq-ico">+</div></button><div class="faq-a"><div class="faq-a-in">Non satisfait dans les 30 jours → on organise le retour à nos frais et on rembourse sous 48h. Sans questions.</div></div></div>
+    <div class="faq-item rv"><button class="faq-q" onclick="tfaq(this)">Délais de livraison ?<div class="faq-ico">+</div></button><div class="faq-a"><div class="faq-a-in">France : 5–8 jours ouvrés avec suivi. Belgique / Suisse / Luxembourg : 7–10 jours.</div></div></div>
+    <div class="faq-item rv"><button class="faq-q" onclick="tfaq(this)">Matériaux certifiés ?<div class="faq-ico">+</div></button><div class="faq-a"><div class="faq-a-in">Oui. Textiles OEKO-TEX® Standard 100. Conformes aux normes CE européennes.</div></div></div>
   </div>
 </section>
 
 <!-- ABOUT -->
-<section class="about-section" id="about">
-  <div class="reveal">
-    <div class="section-eyebrow">Notre histoire</div>
-    <blockquote class="about-quote">"Le sommeil était notre ennemi — aujourd'hui c'est notre superpouvoir."</blockquote>
-    <p class="about-text">Lumès est née d'une frustration personnelle. Après des années à chercher des solutions contre l'insomnie, nous avons créé les produits que nous aurions voulu trouver nous-mêmes.</p>
-    <p class="about-text">Chaque produit résulte d'une collaboration avec des spécialistes du sommeil. Nous ne vendons que ce que nous utilisons chaque nuit.</p>
-    <a href="#produits" class="btn-primary" style="display:inline-block;margin-top:1rem;">Découvrir la collection</a>
+<section class="sec sec-deep" id="about">
+  <div class="rv">
+    <div class="ey">Notre histoire</div>
+    <blockquote class="aquote">"Le sommeil était notre ennemi — aujourd'hui c'est notre superpouvoir."</blockquote>
+    <p class="atxt">Lumès est née d'une frustration personnelle. Après des années à chercher des solutions contre l'insomnie, nous avons créé les produits que nous aurions voulu trouver.</p>
+    <p class="atxt">Chaque produit résulte d'une collaboration avec des spécialistes du sommeil. Nous ne vendons que ce que nous utilisons chaque nuit.</p>
+    <a href="#produits" class="btn btn-gold" style="margin-top:.9rem;display:inline-block">Découvrir la collection</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <a href="#" class="footer-logo">Lumès</a>
-  <p class="footer-tagline">Des nuits transformées, des jours extraordinaires.<br>Dormez mieux. Vivez mieux.</p>
-  <div class="footer-socials">
-    <a href="#" class="social-btn">📱</a>
-    <a href="#" class="social-btn">📸</a>
-    <a href="#" class="social-btn">👥</a>
-    <a href="#" class="social-btn">✉️</a>
+  <a href="#" class="flogo">Lumès</a>
+  <p class="ftagline">Des nuits transformées, des jours extraordinaires.<br>Dormez mieux. Vivez mieux.</p>
+  <div class="fsocials">
+    <a href="#" class="fsoc">📱</a>
+    <a href="#" class="fsoc">📸</a>
+    <a href="#" class="fsoc">👥</a>
+    <a href="#" class="fsoc">✉️</a>
   </div>
-  <div class="footer-cols">
-    <div class="footer-col">
-      <h4>Collection</h4>
-      <ul>
-        <li><a href="#">Gravity Pro™</a></li>
-        <li><a href="#">Drift Pillow™</a></li>
-        <li><a href="#">NightRoll™</a></li>
-        <li><a href="#">SoundVeil™</a></li>
-        <li><a href="#">Sleep Kit™</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Service client</h4>
-      <ul>
-        <li><a href="#">FAQ</a></li>
-        <li><a href="#">Livraison & retours</a></li>
-        <li><a href="#">Garantie</a></li>
-        <li><a href="#">Contact</a></li>
-        <li><a href="#">Mentions légales</a></li>
-      </ul>
-    </div>
+  <div class="fcols">
+    <div class="fcol"><h4>Collection</h4><ul><li><a href="#">Gravity Pro™</a></li><li><a href="#">Drift Pillow™</a></li><li><a href="#">NightRoll™</a></li><li><a href="#">SoundVeil™</a></li><li><a href="#">Sleep Kit™</a></li></ul></div>
+    <div class="fcol"><h4>Service client</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Livraison & retours</a></li><li><a href="#">Garantie</a></li><li><a href="#">Contact</a></li><li><a href="#">Mentions légales</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
+  <div class="fbot">
     <div>© 2026 Lumès SAS — Tous droits réservés</div>
-    <div class="footer-trust">
-      <span class="trust-badge">🔒 SSL</span>
-      <span class="trust-badge">💳 CB / PayPal / Apple Pay</span>
-      <span class="trust-badge">🇫🇷 SAV français</span>
+    <div class="ftrust">
+      <span>🔒 SSL Sécurisé</span>
+      <span>💳 CB / PayPal / Apple Pay</span>
+      <span>🇫🇷 SAV en français</span>
     </div>
   </div>
 </footer>
 
-<!-- STICKY CTA -->
-<div class="sticky-cta" id="stickyCta">
-  <div>
+<!-- STICKY CTA — toujours visible en bas -->
+<div class="sticky">
+  <div class="sticky-l">
     <div class="sticky-price">49,90€</div>
     <div class="sticky-sub">Gravity Pro™ · Livraison offerte</div>
   </div>
   <button class="sticky-btn" onclick="buyNow()">Commander →</button>
 </div>
 
-<!-- CART NOTIF -->
-<div id="cartNotif">✅ Produit ajouté au panier !</div>
+<!-- NOTIF PANIER -->
+<div id="cnotif">✅ Ajouté au panier !</div>
 
 <script>
-// Stars
-var sc = document.getElementById('stars');
-for (var i = 0; i < 60; i++) {
-  var s = document.createElement('div');
-  s.className = 'star-dot';
-  var sz = Math.random() * 1.5 + 0.5;
-  s.style.cssText = 'width:'+sz+'px;height:'+sz+'px;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;--dur:'+(2+Math.random()*4)+'s;--delay:'+Math.random()*5+'s;--mn:'+(0.05+Math.random()*0.1)+';--mx:'+(0.4+Math.random()*0.5)+';';
-  sc.appendChild(s);
-}
+// Étoiles
+(function(){
+  var c = document.getElementById('stars');
+  for(var i=0;i<55;i++){
+    var s=document.createElement('div'); s.className='star-dot';
+    var z=Math.random()*1.4+0.4;
+    s.style.cssText='width:'+z+'px;height:'+z+'px;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;--d:'+(2+Math.random()*4)+'s;--dl:'+Math.random()*5+'s;--a:'+(0.05+Math.random()*0.1)+';--b:'+(0.3+Math.random()*0.5)+';';
+    c.appendChild(s);
+  }
+})();
 
-// Reveal
-var obs = new IntersectionObserver(function(entries) {
-  entries.forEach(function(e) {
-    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-  });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+// Reveal au scroll
+var ro = new IntersectionObserver(function(e){
+  e.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('on'); ro.unobserve(x.target); } });
+},{threshold:0.08});
+document.querySelectorAll('.rv').forEach(function(el){ ro.observe(el); });
 
-// Mobile menu
-var hamburger = document.getElementById('hamburger');
-var mobileMenu = document.getElementById('mobileMenu');
-var menuClose = document.getElementById('menuClose');
-hamburger.addEventListener('click', function() { mobileMenu.classList.add('open'); });
-menuClose.addEventListener('click', function() { mobileMenu.classList.remove('open'); });
-function closeMenu() { mobileMenu.classList.remove('open'); }
+// Menu mobile
+document.getElementById('bburger').onclick = function(){ document.getElementById('mmenu').classList.add('open'); };
+document.getElementById('mclose').onclick  = function(){ document.getElementById('mmenu').classList.remove('open'); };
+function cm(){ document.getElementById('mmenu').classList.remove('open'); }
 
 // FAQ
-function toggleFaq(btn) {
-  var item = btn.parentElement;
-  var isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
-  if (!isOpen) item.classList.add('open');
+function tfaq(btn){
+  var it=btn.parentElement, open=it.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});
+  if(!open) it.classList.add('open');
 }
 
-// Qty
-var qty = 1;
-function changeQty(dir) {
-  qty = Math.max(1, Math.min(10, qty + dir));
-  document.getElementById('qty').textContent = qty;
-  var btn = document.getElementById('cartBtn');
-  var price = (49.90 * qty * (qty >= 2 ? 0.9 : 1)).toFixed(2).replace('.', ',');
-  btn.textContent = '🛒 Ajouter au panier — ' + price + '€';
+// Quantité
+var qty=1;
+function cq(d){
+  qty=Math.max(1,Math.min(10,qty+d));
+  document.getElementById('qty').textContent=qty;
+  var p=(49.90*qty*(qty>=2?.9:1)).toFixed(2).replace('.',',');
+  document.getElementById('cbtn').textContent='🛒 Ajouter au panier — '+p+'€';
 }
 
-// Cart
-function showCartNotif() {
-  var n = document.getElementById('cartNotif');
+// Notif panier
+function notif(){
+  var n=document.getElementById('cnotif');
   n.classList.add('show');
-  setTimeout(function() { n.classList.remove('show'); }, 3000);
-}
-function addToCart() {
-  showCartNotif();
-  var btn = document.getElementById('cartBtn');
-  var orig = btn.textContent;
-  btn.textContent = '✓ Ajouté !';
-  btn.style.background = '#2d5a27';
-  setTimeout(function() { btn.textContent = orig; btn.style.background = ''; }, 2000);
-}
-function buyNow() {
-  alert('Intégrez ici votre lien Stripe ou Shopify Checkout');
+  setTimeout(function(){ n.classList.remove('show'); },2800);
 }
 
-// Btn-add
-document.querySelectorAll('.btn-add').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    showCartNotif();
-    btn.textContent = '✓ Ajouté';
-    btn.style.background = 'var(--gold)';
-    btn.style.color = 'var(--night)';
-    setTimeout(function() { btn.textContent = 'Ajouter'; btn.style.background = ''; btn.style.color = ''; }, 2000);
+// Ajouter au panier
+function addCart(){
+  notif();
+  var b=document.getElementById('cbtn'), o=b.textContent;
+  b.textContent='✓ Ajouté !'; b.style.background='#2a5c25';
+  setTimeout(function(){ b.textContent=o; b.style.background=''; },2000);
+}
+
+// Acheter maintenant
+function buyNow(){
+  alert('Remplacez cette alerte par votre lien Stripe ou Shopify Checkout.');
+}
+
+// Boutons "Ajouter" des produits
+document.querySelectorAll('.badd').forEach(function(b){
+  b.addEventListener('click',function(){
+    notif();
+    b.textContent='✓'; b.style.background='var(--gold)'; b.style.color='var(--night)';
+    setTimeout(function(){ b.textContent='Ajouter'; b.style.background=''; b.style.color=''; },1800);
   });
 });
 </script>
